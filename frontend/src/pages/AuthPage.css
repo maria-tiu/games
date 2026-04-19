@@ -1,0 +1,154 @@
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 120px);
+  padding: 40px 16px;
+}
+
+.auth-card {
+  background: #111127;
+  border: 1px solid #222245;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 440px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid #222245;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 14px 8px;
+  background: transparent;
+  border: none;
+  color: #777;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.2s, background 0.2s;
+}
+
+.auth-tab:hover {
+  color: #ddd;
+  background: #1a1a3a;
+}
+
+.auth-tab.active {
+  color: #00f0f0;
+  background: #1a1a3a;
+  border-bottom: 2px solid #00f0f0;
+}
+
+.auth-form {
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: #00f0f0;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.auth-description {
+  color: #aaa;
+  font-size: 14px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.auth-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #aaa;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.auth-input {
+  background: #0d0d22;
+  border: 1px solid #333355;
+  border-radius: 6px;
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.auth-input:focus {
+  border-color: #00f0f0;
+}
+
+.auth-submit-btn {
+  background: #00f0f0;
+  color: #111;
+  border: none;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.auth-submit-btn:hover {
+  background: #00c8c8;
+}
+
+.auth-submit-btn:active {
+  transform: scale(0.98);
+}
+
+.auth-switch {
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+}
+
+.auth-link-btn {
+  background: transparent;
+  border: none;
+  color: #00f0f0;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.auth-error {
+  color: #ff4d4d;
+  font-size: 13px;
+  text-align: center;
+  padding: 8px;
+  background: rgba(255, 77, 77, 0.1);
+  border-radius: 6px;
+}
+
+.auth-message {
+  color: #4dff91;
+  font-size: 13px;
+  text-align: center;
+  padding: 8px;
+  background: rgba(77, 255, 145, 0.1);
+  border-radius: 6px;
+}

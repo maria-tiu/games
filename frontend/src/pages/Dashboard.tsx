@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import { usePlaylist } from '../context/usePlaylist';
 import './Dashboard.css';
 
 interface Game {
@@ -16,11 +18,25 @@ const GAMES: Game[] = [
 
 export default function Dashboard() {
   const { isLoggedIn } = useAuth();
+  const { isInPlaylist, addGame } = usePlaylist();
   const navigate = useNavigate();
+  const [addingGame, setAddingGame] = useState<string | null>(null);
 
   const handlePlay = (game: Game) => {
     if (!isLoggedIn) return;
     navigate(game.route);
+  };
+
+  const handleAddToPlaylist = async (game: Game) => {
+    if (!isLoggedIn || addingGame) return;
+    setAddingGame(game.id);
+    try {
+      await addGame(game.id, game.name);
+    } catch {
+      // ignore errors
+    } finally {
+      setAddingGame(null);
+    }
   };
 
   return (
@@ -38,32 +54,42 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {GAMES.map((game) => (
-              <tr key={game.id}>
-                <td className="game-name">{game.name}</td>
-                <td>{game.players}</td>
-                <td>
-                  <button
-                    className="btn-action btn-add"
-                    disabled={!isLoggedIn}
-                    title={!isLoggedIn ? 'Login to add to playlist' : 'Add to playlist'}
-                  >
-                    Add to playlist
-                  </button>
-                </td>
-                <td>
-                  <button
-                    className="btn-action btn-play"
-                    disabled={!isLoggedIn}
-                    onClick={() => handlePlay(game)}
-                    title={!isLoggedIn ? 'Login to play' : `Play ${game.name}`}
-                  >
-                    Play
-                  </button>
-                </td>
-                <td className="game-score">{game.score}</td>
-              </tr>
-            ))}
+            {GAMES.map((game) => {
+              const inPlaylist = isInPlaylist(game.id);
+              return (
+                <tr key={game.id}>
+                  <td className="game-name">{game.name}</td>
+                  <td>{game.players}</td>
+                  <td>
+                    <button
+                      className={`btn-action ${inPlaylist ? 'btn-added' : 'btn-add'}`}
+                      disabled={!isLoggedIn || inPlaylist || addingGame === game.id}
+                      onClick={() => void handleAddToPlaylist(game)}
+                      title={
+                        !isLoggedIn
+                          ? 'Login to add to playlist'
+                          : inPlaylist
+                          ? 'Already in your playlist'
+                          : 'Add to playlist'
+                      }
+                    >
+                      {inPlaylist ? 'Added ✓' : addingGame === game.id ? 'Adding…' : 'Add to playlist'}
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      className="btn-action btn-play"
+                      disabled={!isLoggedIn}
+                      onClick={() => handlePlay(game)}
+                      title={!isLoggedIn ? 'Login to play' : `Play ${game.name}`}
+                    >
+                      Play
+                    </button>
+                  </td>
+                  <td className="game-score">{game.score}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

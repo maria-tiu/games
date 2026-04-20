@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import { AuthProvider } from './context/AuthContext.tsx'
 import Layout from './components/Layout.tsx'
@@ -13,11 +13,12 @@ createRoot(document.getElementById('root')!).render(
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/auth" element={<AuthPage />} />
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="auth" element={<AuthPage />} />
           </Route>
           <Route path="/tetris" element={<TetrisGame />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -8,7 +8,12 @@ import { fetchHighScores, submitScore } from './api/scores';
 import type { ScoreEntry } from './types';
 import './App.css';
 
-function App() {
+interface AppProps {
+  username: string;
+  onLogout: () => void;
+}
+
+function App({ username, onLogout }: AppProps) {
   const {
     gameState,
     moveLeft,
@@ -141,6 +146,10 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1 className="app-title">TETRIS</h1>
+        <div className="app-header-user">
+          <span className="app-username">👾 {username}</span>
+          <button className="btn btn-logout" onClick={onLogout}>Logout</button>
+        </div>
       </header>
       <main className="game-container">
         <aside className="sidebar sidebar-left">

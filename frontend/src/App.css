@@ -17,6 +17,37 @@
   padding: 16px;
   text-align: center;
   border-bottom: 1px solid #222;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-header-user {
+  position: absolute;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-username {
+  font-size: 13px;
+  color: #00f0f0;
+  letter-spacing: 1px;
+}
+
+.btn-logout {
+  background-color: transparent;
+  color: #888;
+  border: 1px solid #444;
+  font-size: 11px;
+  padding: 6px 10px;
+}
+
+.btn-logout:hover {
+  color: #00f0f0;
+  border-color: #00f0f0;
 }
 
 .app-title {

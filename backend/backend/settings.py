@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     'tetris',
 ]
@@ -56,6 +57,12 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+]
+
+# Allow local frontend dev servers regardless of chosen port (e.g. 5173, 5174).
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^http://localhost:\d+$',
+    r'^http://127\.0\.0\.1:\d+$',
 ]
 
 ROOT_URLCONF = 'backend.urls'

@@ -39,11 +39,13 @@ class LoginView(APIView):
     def post(self, request):
         username = request.data.get('username', '').strip()
         password = request.data.get('password', '')
+        if not User.objects.filter(username=username).exists():
+            return Response({'detail': 'Username not found.'}, status=status.HTTP_401_UNAUTHORIZED)
         user = authenticate(username=username, password=password)
         if user:
             token, _ = Token.objects.get_or_create(user=user)
             return Response({'token': token.key, 'username': user.username})
-        return Response({'detail': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'detail': 'Incorrect password.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(APIView):

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import { usePlaylist } from '../context/usePlaylist';
 import './Dashboard.css';
 
 interface Game {
@@ -12,15 +13,26 @@ interface Game {
 
 const GAMES: Game[] = [
   { id: 'tetris', name: 'Tetris', players: 1, route: '/tetris', score: 0 },
+  { id: 'sliding-puzzle', name: 'Sliding Puzzle', players: 1, route: '/sliding-puzzle', score: 0 },
 ];
 
 export default function Dashboard() {
   const { isLoggedIn } = useAuth();
+  const { addToPlaylist, removeFromPlaylist, isInPlaylist } = usePlaylist();
   const navigate = useNavigate();
 
   const handlePlay = (game: Game) => {
     if (!isLoggedIn) return;
     navigate(game.route);
+  };
+
+  const handlePlaylistToggle = (game: Game) => {
+    if (!isLoggedIn) return;
+    if (isInPlaylist(game.id)) {
+      removeFromPlaylist(game.id);
+    } else {
+      addToPlaylist(game.id);
+    }
   };
 
   return (
@@ -44,11 +56,12 @@ export default function Dashboard() {
                 <td>{game.players}</td>
                 <td>
                   <button
-                    className="btn-action btn-add"
+                    className={`btn-action ${isLoggedIn && isInPlaylist(game.id) ? 'btn-in-playlist' : 'btn-add'}`}
                     disabled={!isLoggedIn}
-                    title={!isLoggedIn ? 'Login to add to playlist' : 'Add to playlist'}
+                    onClick={() => handlePlaylistToggle(game)}
+                    title={!isLoggedIn ? 'Login to add to playlist' : isInPlaylist(game.id) ? 'Remove from playlist' : 'Add to playlist'}
                   >
-                    Add to playlist
+                    {isLoggedIn && isInPlaylist(game.id) ? '✓ In Playlist' : 'Add to playlist'}
                   </button>
                 </td>
                 <td>

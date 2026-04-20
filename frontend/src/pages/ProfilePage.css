@@ -1,0 +1,126 @@
+.profile-page {
+  padding: 40px 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.profile-title {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #00f0f0;
+  text-shadow: 0 0 12px rgba(0, 240, 240, 0.5);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.profile-username {
+  text-align: center;
+  color: #aaa;
+  font-size: 15px;
+  margin-bottom: 40px;
+}
+
+.profile-username span {
+  color: #fff;
+  font-weight: 700;
+}
+
+.profile-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #00f0f0;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #222245;
+  padding-bottom: 8px;
+}
+
+.profile-playlist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.profile-playlist-empty {
+  color: #555;
+  font-size: 14px;
+  text-align: center;
+  padding: 32px 0;
+}
+
+.profile-playlist-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #111127;
+  border: 1px solid #222245;
+  border-radius: 8px;
+  padding: 16px 20px;
+  transition: border-color 0.2s;
+}
+
+.profile-playlist-card:hover {
+  border-color: #00f0f0;
+}
+
+.profile-playlist-card-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.profile-playlist-card-players {
+  font-size: 13px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.profile-playlist-card-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.profile-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: transform 0.1s, opacity 0.2s, background 0.2s;
+}
+
+.profile-btn:active {
+  transform: scale(0.97);
+}
+
+.profile-btn-play {
+  background-color: #00f0f0;
+  color: #111;
+}
+
+.profile-btn-play:hover {
+  background-color: #00c8c8;
+}
+
+.profile-btn-remove {
+  background-color: transparent;
+  color: #888;
+  border: 1px solid #444;
+}
+
+.profile-btn-remove:hover {
+  color: #f04040;
+  border-color: #f04040;
+}
+
+.profile-dashboard-link {
+  color: #00f0f0;
+  text-decoration: underline;
+}

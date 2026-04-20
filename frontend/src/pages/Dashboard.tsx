@@ -69,7 +69,7 @@ export default function Dashboard() {
       </div>
       {!isLoggedIn && (
         <p className="dashboard-login-hint">
-          Please <a href="/auth">login or sign up</a> to enable Play and Add to playlist buttons.
+          Please <a href="/auth">login or sign up</a> to start to play.
         </p>
       )}
     </div>

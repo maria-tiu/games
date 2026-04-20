@@ -8,10 +8,6 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-brand">🎮 GAMES</div>
-      <ul className="navbar-links">
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/auth">Your board</Link></li>
-      </ul>
       <div className="navbar-auth">
         {isLoggedIn ? (
           <>

@@ -4,7 +4,6 @@ import {
   register,
   requestPasswordReset,
   confirmPasswordReset,
-  type ApiError,
 } from '../api/auth';
 import './AuthPage.css';
 
@@ -14,10 +13,20 @@ interface AuthPageProps {
   onAuth: (token: string, username: string) => void;
 }
 
-function formatErrors(err: ApiError): string {
-  return Object.values(err)
-    .flat()
-    .join(' ');
+const NETWORK_ERROR_MSG = 'Service unavailable. Please try again later.';
+
+function formatErrors(err: unknown): string {
+  // Native JS error (e.g. TypeError: Failed to fetch)
+  if (err instanceof Error) {
+    return NETWORK_ERROR_MSG;
+  }
+  if (err && typeof err === 'object') {
+    return Object.values(err as Record<string, unknown>)
+      .flat()
+      .filter((v): v is string => typeof v === 'string')
+      .join(' · ');
+  }
+  return '';
 }
 
 const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
@@ -56,7 +65,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
       const data = await login(loginUsername.trim(), loginPassword);
       onAuth(data.token, data.username);
     } catch (err) {
-      setError(formatErrors(err as ApiError) || 'Login failed.');
+      setError(formatErrors(err) || 'Login failed.');
     } finally {
       setLoading(false);
     }
@@ -75,7 +84,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
       );
       onAuth(data.token, data.username);
     } catch (err) {
-      setError(formatErrors(err as ApiError) || 'Registration failed.');
+      setError(formatErrors(err) || 'Registration failed.');
     } finally {
       setLoading(false);
     }
@@ -93,7 +102,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
         setTab('reset');
       }
     } catch (err) {
-      setError(formatErrors(err as ApiError) || 'Request failed.');
+      setError(formatErrors(err) || 'Request failed.');
     } finally {
       setLoading(false);
     }
@@ -111,7 +120,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
       setNewPassword('');
       setNewPassword2('');
     } catch (err) {
-      setError(formatErrors(err as ApiError) || 'Password reset failed.');
+      setError(formatErrors(err) || 'Password reset failed.');
     } finally {
       setLoading(false);
     }

@@ -66,7 +66,7 @@ class PasswordResetRequestView(APIView):
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 token = default_token_generator.make_token(user)
                 reset_token = f"{uid}.{token}"
-                response_data: dict = {'detail': 'Password reset link sent.'}
+                response_data: dict[str, str] = {'detail': 'Password reset link sent.'}
                 # In production, send the reset_token via email only.
                 # Expose it in the response body only in DEBUG mode for development convenience.
                 if settings.DEBUG:

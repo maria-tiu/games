@@ -10,7 +10,13 @@ export interface ApiError {
 }
 
 async function handleResponse<T>(res: Response): Promise<T> {
-  const data = await res.json();
+  let data: unknown;
+  try {
+    data = await res.json();
+  } catch {
+    // Response body is not JSON (e.g. a Django 500 HTML page)
+    throw { detail: `Server error (HTTP ${res.status})` } as ApiError;
+  }
   if (!res.ok) {
     throw data as ApiError;
   }

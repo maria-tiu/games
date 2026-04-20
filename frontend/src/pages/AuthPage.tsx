@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  login,
+  login as apiLogin,
   register,
   requestPasswordReset,
   confirmPasswordReset,
 } from '../api/auth';
+import { useAuth } from '../context/useAuth';
 import './AuthPage.css';
 
 type Tab = 'login' | 'signup' | 'forgot' | 'reset';
 
-interface AuthPageProps {
-  onAuth: (token: string, username: string) => void;
-}
-
 const NETWORK_ERROR_MSG = 'Service unavailable. Please try again later.';
 
 function formatErrors(err: unknown): string {
-  // Native JS error (e.g. TypeError: Failed to fetch)
   if (err instanceof Error) {
     return NETWORK_ERROR_MSG;
   }
@@ -29,7 +26,10 @@ function formatErrors(err: unknown): string {
   return '';
 }
 
-const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
+const AuthPage: React.FC = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const [tab, setTab] = useState<Tab>('login');
 
   // Login state
@@ -62,8 +62,9 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
     clearMessages();
     setLoading(true);
     try {
-      const data = await login(loginUsername.trim(), loginPassword);
-      onAuth(data.token, data.username);
+      const data = await apiLogin(loginUsername.trim(), loginPassword);
+      login(data.token, data.username);
+      navigate('/');
     } catch (err) {
       setError(formatErrors(err) || 'Login failed.');
     } finally {
@@ -82,7 +83,8 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
         signupPassword,
         signupPassword2,
       );
-      onAuth(data.token, data.username);
+      login(data.token, data.username);
+      navigate('/');
     } catch (err) {
       setError(formatErrors(err) || 'Registration failed.');
     } finally {

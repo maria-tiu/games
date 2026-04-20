@@ -1,0 +1,11 @@
+.app-footer {
+  text-align: center;
+  padding: 16px;
+  background-color: #111127;
+  border-top: 2px solid #00f0f0;
+  color: #aaa;
+  font-size: 13px;
+  letter-spacing: 2px;
+  font-weight: 600;
+  text-transform: uppercase;
+}

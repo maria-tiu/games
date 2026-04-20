@@ -59,6 +59,12 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
 ]
 
+# Allow local frontend dev servers regardless of chosen port (e.g. 5173, 5174).
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^http://localhost:\d+$',
+    r'^http://127\.0\.0\.1:\d+$',
+]
+
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [

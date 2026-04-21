@@ -11,7 +11,7 @@ export default function Navbar() {
       <div className="navbar-auth">
         {isLoggedIn ? (
           <>
-            <Link to="/profile" className="navbar-profile-link">👤 {username}</Link>
+            <Link to="/profile" className="navbar-username">👤 {username}</Link>
             <button className="navbar-logout-btn" onClick={logout}>Logout</button>
           </>
         ) : (

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import Score
+from .models import Score, UserGame
 
 
 class ScoreSerializer(serializers.ModelSerializer):
@@ -56,4 +56,29 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             raise serializers.ValidationError({'new_password2': 'Passwords do not match.'})
         validate_password(data['new_password'])
         return data
+
+
+class UserGameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserGame
+        fields = ['id', 'game_id', 'game_name', 'added_at']
+        read_only_fields = ['id', 'added_at']
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+    def validate_username(self, value):
+        user = self.instance
+        if User.objects.filter(username=value).exclude(pk=user.pk).exists():
+            raise serializers.ValidationError('Username already taken.')
+        return value
+
+    def validate_email(self, value):
+        user = self.instance
+        if User.objects.filter(email=value).exclude(pk=user.pk).exists():
+            raise serializers.ValidationError('Email already registered.')
+        return value
 

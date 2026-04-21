@@ -8,6 +8,7 @@ export interface AuthContextType {
   token: string | null;
   login: (token: string, username: string) => void;
   logout: () => void;
+  updateUsername: (newUsername: string) => void;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components -- context file exports both provider and context
@@ -34,8 +35,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUsername(null);
   };
 
+  const updateUsername = (newUsername: string) => {
+    localStorage.setItem('authUsername', newUsername);
+    setUsername(newUsername);
+  };
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn: token !== null, username, token, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn: token !== null, username, token, login, logout, updateUsername }}>
       {children}
     </AuthContext.Provider>
   );

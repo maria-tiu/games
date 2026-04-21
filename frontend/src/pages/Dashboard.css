@@ -97,14 +97,10 @@
   background-color: #6d28d9;
 }
 
-.btn-in-playlist {
-  background-color: #1e4d30;
-  color: #00f0a0;
-  border: 1px solid #00a070;
-}
-
-.btn-in-playlist:not(:disabled):hover {
-  background-color: #163820;
+.btn-added {
+  background-color: #1a4a1a;
+  color: #4ade80;
+  border: 1px solid #4ade80;
 }
 
 .btn-play {

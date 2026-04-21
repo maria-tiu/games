@@ -23,9 +23,18 @@ from .serializers import (
 
 class ScoreListCreateView(generics.ListCreateAPIView):
     serializer_class = ScoreSerializer
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
-        return Score.objects.all()[:10]
+        game_id = self.request.query_params.get('game_id')
+        qs = Score.objects.all()
+        if game_id:
+            qs = qs.filter(game_id=game_id)
+        return qs[:10]
+
+    def perform_create(self, serializer):
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(user=user)
 
 
 class RegisterView(APIView):
@@ -159,4 +168,27 @@ class UserGameDetailView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         user_game.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserScoreView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Return the most-recent score per game for the authenticated user.
+
+        Matches scores by user FK (new records) OR by player_name (legacy records
+        submitted before the user FK was added to the model).
+        """
+        from django.db.models import Subquery, OuterRef, Q
+        user_filter = Q(user=request.user) | Q(player_name=request.user.username)
+        latest_id_per_game = (
+            Score.objects.filter(user_filter, game_id=OuterRef('game_id'))
+            .order_by('-created_at')
+            .values('id')[:1]
+        )
+        scores = Score.objects.filter(
+            user_filter, id=Subquery(latest_id_per_game)
+        ).order_by('game_id')
+        serializer = ScoreSerializer(scores, many=True)
+        return Response(serializer.data)
 

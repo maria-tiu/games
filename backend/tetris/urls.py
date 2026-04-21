@@ -9,6 +9,7 @@ from .views import (
     UserProfileView,
     UserGameListView,
     UserGameDetailView,
+    UserScoreView,
 )
 
 urlpatterns = [
@@ -21,5 +22,6 @@ urlpatterns = [
     path('auth/profile/', UserProfileView.as_view(), name='auth-profile'),
     path('auth/games/', UserGameListView.as_view(), name='user-games-list'),
     path('auth/games/<int:pk>/', UserGameDetailView.as_view(), name='user-game-detail'),
+    path('auth/my-scores/', UserScoreView.as_view(), name='user-scores'),
 ]
 

@@ -1,5 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/useAuth';
+import { submitScore } from '../api/scores';
 import './SlidingPuzzle.css';
 
 type Board = number[];
@@ -53,6 +55,7 @@ const TILE_SIZE: Record<number, number> = { 3: 100, 4: 80, 5: 64 };
 
 export default function SlidingPuzzle() {
   const navigate = useNavigate();
+  const { isLoggedIn, username, token } = useAuth();
   const [size, setSize] = useState(4);
   const [board, setBoard] = useState<Board>(() => shuffle(createSolvedBoard(4), 4));
   const [moves, setMoves] = useState(0);
@@ -87,6 +90,15 @@ export default function SlidingPuzzle() {
     return () => clearInterval(timer);
   }, [running, won]);
 
+  const submitPuzzleScore = useCallback((completedMoves: number) => {
+    if (!isLoggedIn || !username || !token) return;
+    const puzzleScore = Math.max(0, 1000 - completedMoves);
+    submitScore(
+      { game_id: 'sliding-puzzle', player_name: username, score: puzzleScore, lines_cleared: completedMoves, level: size },
+      token,
+    ).catch(() => {});
+  }, [isLoggedIn, username, token, size]);
+
   const handleTileClick = (idx: number) => {
     if (won) return;
     const blankIdx = board.indexOf(0);
@@ -99,6 +111,7 @@ export default function SlidingPuzzle() {
     if (isSolved(newBoard, size)) {
       setWon(true);
       setRunning(false);
+      submitPuzzleScore(newMoves);
     }
   };
 
@@ -135,9 +148,10 @@ export default function SlidingPuzzle() {
       if (isSolved(newBoard, size)) {
         setWon(true);
         setRunning(false);
+        submitPuzzleScore(newMoves);
       }
     }
-  }, [board, size, moves, won]);
+  }, [board, size, moves, won, submitPuzzleScore]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);

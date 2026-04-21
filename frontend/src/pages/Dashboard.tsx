@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { usePlaylist } from '../context/usePlaylist';
+import { fetchHighScores } from '../api/scores';
+import type { ScoreEntry } from '../types';
+import GameInstructionsModal from '../components/GameInstructionsModal';
+import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
 import './Dashboard.css';
 
 interface Game {
@@ -9,12 +13,11 @@ interface Game {
   name: string;
   players: number;
   route: string;
-  score: number;
 }
 
 const GAMES: Game[] = [
-  { id: 'tetris', name: 'Tetris', players: 1, route: '/tetris', score: 0 },
-  { id: 'sliding-puzzle', name: 'Sliding Puzzle', players: 1, route: '/sliding-puzzle', score: 0 },
+  { id: 'tetris', name: 'Tetris', players: 1, route: '/tetris' },
+  { id: 'sliding-puzzle', name: 'Sliding Puzzle', players: 1, route: '/sliding-puzzle' },
 ];
 
 export default function Dashboard() {
@@ -22,6 +25,22 @@ export default function Dashboard() {
   const { isInPlaylist, addGame } = usePlaylist();
   const navigate = useNavigate();
   const [addingGame, setAddingGame] = useState<string | null>(null);
+  const [bestScores, setBestScores] = useState<Record<string, ScoreEntry>>({});
+  const [instructionsGameId, setInstructionsGameId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const map: Record<string, ScoreEntry> = {};
+    const fetches = GAMES.map((game) =>
+      fetchHighScores(game.id)
+        .then((scores) => {
+          if (scores.length > 0) map[game.id] = scores[0];
+        })
+        .catch(() => {
+          // ignore — best score column will simply be empty for this game
+        })
+    );
+    Promise.all(fetches).then(() => setBestScores({ ...map }));
+  }, []);
 
   const handlePlay = (game: Game) => {
     if (!isLoggedIn) return;
@@ -49,17 +68,31 @@ export default function Dashboard() {
             <tr>
               <th>Game</th>
               <th>Number of players</th>
-              <th>Add to playlist</th>
+              <th>Playlist</th>
               <th>Play now</th>
-              <th>Your score</th>
+              <th>Best score</th>
             </tr>
           </thead>
           <tbody>
             {GAMES.map((game) => {
               const inPlaylist = isInPlaylist(game.id);
+              const best = bestScores[game.id];
+              const hasInstructions = game.id in GAME_INSTRUCTIONS;
               return (
                 <tr key={game.id}>
-                  <td className="game-name">{game.name}</td>
+                  <td className="game-name">
+                    {game.name}
+                    {hasInstructions && (
+                      <button
+                        className="btn-info"
+                        onClick={() => setInstructionsGameId(game.id)}
+                        title={`How to play ${game.name}`}
+                        aria-label={`How to play ${game.name}`}
+                      >
+                        ?
+                      </button>
+                    )}
+                  </td>
                   <td>{game.players}</td>
                   <td>
                     <button
@@ -74,7 +107,7 @@ export default function Dashboard() {
                           : 'Add to playlist'
                       }
                     >
-                      {inPlaylist ? 'Added ✓' : addingGame === game.id ? 'Adding…' : 'Add to playlist'}
+                      {inPlaylist ? 'Added ✓' : addingGame === game.id ? '…' : 'Add'}
                     </button>
                   </td>
                   <td>
@@ -87,7 +120,16 @@ export default function Dashboard() {
                       Play
                     </button>
                   </td>
-                  <td className="game-score">{game.score}</td>
+                  <td className="game-score">
+                    {best ? (
+                      <>
+                        <span>{best.score}</span>
+                        <div className="game-best-player">{best.player_name}</div>
+                      </>
+                    ) : (
+                      <span className="game-score-none">—</span>
+                    )}
+                  </td>
                 </tr>
               );
             })}
@@ -98,6 +140,13 @@ export default function Dashboard() {
         <p className="dashboard-login-hint">
           Please <a href="/auth">login or sign up</a> to start to play.
         </p>
+      )}
+
+      {instructionsGameId && (
+        <GameInstructionsModal
+          gameId={instructionsGameId}
+          onClose={() => setInstructionsGameId(null)}
+        />
       )}
     </div>
   );

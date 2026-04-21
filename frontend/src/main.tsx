@@ -14,22 +14,22 @@ import ProfilePage from './pages/ProfilePage.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider>
     <AuthProvider>
       <PlaylistProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="auth" element={<AuthPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-            </Route>
-            <Route path="/tetris" element={<TetrisGame />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </BrowserRouter>
+        <ThemeProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="auth" element={<AuthPage />} />
+                <Route path="profile" element={<ProfilePage />} />
+              </Route>
+              <Route path="/tetris" element={<TetrisGame />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </ThemeProvider>
       </PlaylistProvider>
     </AuthProvider>
-    </ThemeProvider>
   </StrictMode>,
 )

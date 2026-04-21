@@ -5,6 +5,8 @@ import { usePlaylist } from '../context/usePlaylist';
 import { fetchUserProfile, updateUserProfile } from '../api/profile';
 import { fetchHighScores } from '../api/scores';
 import type { UserProfile } from '../api/profile';
+import GameInstructionsModal from '../components/GameInstructionsModal';
+import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
 import './ProfilePage.css';
 
 const GAME_ROUTES: Record<string, string> = {
@@ -38,6 +40,7 @@ export default function ProfilePage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const [instructionsGameId, setInstructionsGameId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -55,7 +58,9 @@ export default function ProfilePage() {
       .finally(() => setLoadingProfile(false));
   }, [isLoggedIn, token, navigate]);
 
-  // Fetch all high scores and derive the user's personal best per game
+  // Fetch all high scores and derive the user's personal best per game.
+  // Note: ScoreEntry has no game_id field — all scores in the current API
+  // are Tetris scores, so we map them under each playlist game's game_id.
   useEffect(() => {
     if (!isLoggedIn || !username) return;
     fetchHighScores()
@@ -63,16 +68,22 @@ export default function ProfilePage() {
         const myScores: Record<string, number> = {};
         for (const s of scores) {
           if (s.player_name === username) {
-            // Only one game (tetris) for now; use game_id key "tetris"
-            if (myScores['tetris'] === undefined || s.score > myScores['tetris']) {
-              myScores['tetris'] = s.score;
+            // Map the score under every game_id from the user's playlist
+            // (since the API returns a single pool of Tetris scores).
+            for (const entry of playlist) {
+              if (
+                myScores[entry.game_id] === undefined ||
+                s.score > myScores[entry.game_id]
+              ) {
+                myScores[entry.game_id] = s.score;
+              }
             }
           }
         }
         setMyBestScore(myScores);
       })
       .catch(() => {});
-  }, [isLoggedIn, username]);
+  }, [isLoggedIn, username, playlist]);
 
   const handleSaveUsername = async () => {
     if (!token || !profile) return;
@@ -247,7 +258,19 @@ export default function ProfilePage() {
             <tbody>
               {playlist.map((entry) => (
                 <tr key={entry.id}>
-                  <td className="game-name">{entry.game_name}</td>
+                  <td className="game-name">
+                    {entry.game_name}
+                    {entry.game_id in GAME_INSTRUCTIONS && (
+                      <button
+                        className="btn-info"
+                        onClick={() => setInstructionsGameId(entry.game_id)}
+                        title={`How to play ${entry.game_name}`}
+                        aria-label={`How to play ${entry.game_name}`}
+                      >
+                        ?
+                      </button>
+                    )}
+                  </td>
                   <td className="game-score">
                     {myBestScore[entry.game_id] !== undefined
                       ? myBestScore[entry.game_id]
@@ -277,6 +300,13 @@ export default function ProfilePage() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {instructionsGameId && (
+        <GameInstructionsModal
+          gameId={instructionsGameId}
+          onClose={() => setInstructionsGameId(null)}
+        />
       )}
     </div>
   );

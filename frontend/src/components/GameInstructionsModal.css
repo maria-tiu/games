@@ -1,0 +1,226 @@
+/* ── Backdrop ────────────────────────────────────────────── */
+.instructions-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: backdrop-fade-in 0.15s ease;
+}
+
+@keyframes backdrop-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Modal card ──────────────────────────────────────────── */
+.instructions-modal {
+  background: #111127;
+  border: 1px solid #00f0f0;
+  border-radius: 10px;
+  padding: 28px 32px 32px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0 32px rgba(0, 240, 240, 0.2);
+  animation: modal-slide-in 0.18s ease;
+}
+
+@keyframes modal-slide-in {
+  from { transform: translateY(-16px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.instructions-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.instructions-title {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #00f0f0;
+  text-shadow: 0 0 10px rgba(0, 240, 240, 0.4);
+}
+
+.instructions-close-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid #555;
+  color: #aaa;
+  font-size: 14px;
+  border-radius: 4px;
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  line-height: 1;
+}
+
+.instructions-close-btn:hover {
+  border-color: #00f0f0;
+  color: #00f0f0;
+}
+
+/* ── Description ─────────────────────────────────────────── */
+.instructions-description {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+/* ── Section headings ─────────────────────────────────────── */
+.instructions-section-heading {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #00f0f0;
+  margin-bottom: 12px;
+}
+
+/* ── Controls list ───────────────────────────────────────── */
+.instructions-controls {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.instructions-control-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.instructions-key {
+  display: inline-block;
+  min-width: 64px;
+  text-align: center;
+  background: #1a1a3a;
+  border: 1px solid #444;
+  border-radius: 5px;
+  color: #fff;
+  font-family: monospace;
+  font-size: 13px;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+
+.instructions-action {
+  color: #ddd;
+  font-size: 14px;
+}
+
+/* ── Tips list ───────────────────────────────────────────── */
+.instructions-tips {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.instructions-tip {
+  color: #ccc;
+  font-size: 13px;
+  line-height: 1.5;
+  padding-left: 16px;
+  position: relative;
+}
+
+.instructions-tip::before {
+  content: '★';
+  position: absolute;
+  left: 0;
+  color: #00f0f0;
+  font-size: 10px;
+  top: 2px;
+}
+
+/* ── Info icon button (used in tables) ───────────────────── */
+.btn-info {
+  background: transparent;
+  border: 1px solid #00f0f0;
+  color: #00f0f0;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.btn-info:hover {
+  background: #00f0f0;
+  color: #111;
+}
+
+/* ── Light mode overrides ────────────────────────────────── */
+[data-theme="light"] .instructions-modal {
+  background: #ffffff;
+  border-color: #0077bb;
+  box-shadow: 0 0 32px rgba(0, 119, 187, 0.15);
+}
+
+[data-theme="light"] .instructions-title {
+  color: #0077bb;
+  text-shadow: none;
+}
+
+[data-theme="light"] .instructions-section-heading {
+  color: #0077bb;
+}
+
+[data-theme="light"] .instructions-description,
+[data-theme="light"] .instructions-action,
+[data-theme="light"] .instructions-tip {
+  color: #3a3a5c;
+}
+
+[data-theme="light"] .instructions-key {
+  background: #eef2ff;
+  border-color: #c0caef;
+  color: #111127;
+}
+
+[data-theme="light"] .instructions-close-btn {
+  border-color: #999;
+  color: #666;
+}
+
+[data-theme="light"] .instructions-close-btn:hover {
+  border-color: #0077bb;
+  color: #0077bb;
+}
+
+[data-theme="light"] .instructions-tip::before {
+  color: #0077bb;
+}
+
+[data-theme="light"] .btn-info {
+  border-color: #0077bb;
+  color: #0077bb;
+}
+
+[data-theme="light"] .btn-info:hover {
+  background: #0077bb;
+  color: #fff;
+}

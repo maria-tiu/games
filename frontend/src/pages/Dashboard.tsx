@@ -4,6 +4,8 @@ import { useAuth } from '../context/useAuth';
 import { usePlaylist } from '../context/usePlaylist';
 import { fetchHighScores } from '../api/scores';
 import type { ScoreEntry } from '../types';
+import GameInstructionsModal from '../components/GameInstructionsModal';
+import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
 import './Dashboard.css';
 
 interface Game {
@@ -23,14 +25,21 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [addingGame, setAddingGame] = useState<string | null>(null);
   const [bestScores, setBestScores] = useState<Record<string, ScoreEntry>>({});
+  const [instructionsGameId, setInstructionsGameId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchHighScores()
       .then((scores) => {
-        // The API returns scores sorted descending by score; pick the top entry per game.
-        // Currently there is only one game (tetris) so we just take scores[0].
         if (scores.length > 0) {
-          setBestScores({ tetris: scores[0] });
+          // The scores API currently returns only Tetris scores (no game_id field).
+          // We populate the map using each game's own id as the key so the table
+          // stays data-driven even if more games with separate endpoints are added.
+          const map: Record<string, ScoreEntry> = {};
+          for (const game of GAMES) {
+            const top = scores[0]; // API returns scores sorted by score desc
+            if (top) map[game.id] = top;
+          }
+          setBestScores(map);
         }
       })
       .catch(() => {
@@ -73,9 +82,22 @@ export default function Dashboard() {
             {GAMES.map((game) => {
               const inPlaylist = isInPlaylist(game.id);
               const best = bestScores[game.id];
+              const hasInstructions = game.id in GAME_INSTRUCTIONS;
               return (
                 <tr key={game.id}>
-                  <td className="game-name">{game.name}</td>
+                  <td className="game-name">
+                    {game.name}
+                    {hasInstructions && (
+                      <button
+                        className="btn-info"
+                        onClick={() => setInstructionsGameId(game.id)}
+                        title={`How to play ${game.name}`}
+                        aria-label={`How to play ${game.name}`}
+                      >
+                        ?
+                      </button>
+                    )}
+                  </td>
                   <td>{game.players}</td>
                   <td>
                     <button
@@ -123,6 +145,13 @@ export default function Dashboard() {
         <p className="dashboard-login-hint">
           Please <a href="/auth">login or sign up</a> to start to play.
         </p>
+      )}
+
+      {instructionsGameId && (
+        <GameInstructionsModal
+          gameId={instructionsGameId}
+          onClose={() => setInstructionsGameId(null)}
+        />
       )}
     </div>
   );

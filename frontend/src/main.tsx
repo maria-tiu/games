@@ -10,6 +10,7 @@ import Layout from './components/Layout.tsx'
 import Dashboard from './pages/Dashboard.tsx'
 import AuthPage from './pages/AuthPage.tsx'
 import TetrisGame from './pages/TetrisGame.tsx'
+import SlidingPuzzle from './pages/SlidingPuzzle.tsx'
 import ProfilePage from './pages/ProfilePage.tsx'
 
 createRoot(document.getElementById('root')!).render(
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="profile" element={<ProfilePage />} />
               </Route>
               <Route path="/tetris" element={<TetrisGame />} />
+              <Route path="/sliding-puzzle" element={<SlidingPuzzle />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>
@@ -33,3 +35,4 @@ createRoot(document.getElementById('root')!).render(
     </AuthProvider>
   </StrictMode>,
 )
+

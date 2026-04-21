@@ -17,6 +17,7 @@ interface Game {
 
 const GAMES: Game[] = [
   { id: 'tetris', name: 'Tetris', players: 1, route: '/tetris' },
+  { id: 'sliding-puzzle', name: 'Sliding Puzzle', players: 1, route: '/sliding-puzzle' },
 ];
 
 export default function Dashboard() {
@@ -156,3 +157,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

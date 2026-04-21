@@ -11,6 +11,7 @@ import './ProfilePage.css';
 
 const GAME_ROUTES: Record<string, string> = {
   tetris: '/tetris',
+  'sliding-puzzle': '/sliding-puzzle',
 };
 
 function formatErrors(err: unknown): string {

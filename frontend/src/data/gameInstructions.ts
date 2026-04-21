@@ -28,4 +28,18 @@ export const GAME_INSTRUCTIONS: Record<string, GameInstructionsData> = {
       'The ghost piece shows where the current piece will land.',
     ],
   },
+  'sliding-puzzle': {
+    title: 'How to play Sliding Puzzle',
+    description:
+      'Arrange the numbered tiles in order (1, 2, 3 … left to right, top to bottom) with the blank space in the bottom-right corner. Click any tile adjacent to the blank space to slide it into the gap.',
+    controls: [
+      { key: 'Click', action: 'Slide an adjacent tile into the blank space' },
+      { key: '↑ ↓ ← →', action: 'Move the blank space with arrow keys' },
+    ],
+    tips: [
+      'Start by solving the top rows first, then work your way down.',
+      'Fewer moves in less time gives a better score.',
+      'Choose a smaller grid (3×3) to practice before trying 4×4 or 5×5.',
+    ],
+  },
 };

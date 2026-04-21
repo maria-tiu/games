@@ -52,6 +52,18 @@
   text-shadow: 0 0 8px rgba(0, 240, 240, 0.7);
 }
 
+.navbar-profile-link {
+  color: #00f0f0;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.navbar-profile-link:hover {
+  opacity: 0.8;
+}
+
 .navbar-logout-btn {
   background: transparent;
   border: 1px solid #00f0f0;

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/useAuth';
+import { submitScore } from '../api/scores';
 import './BreakoutGame.css';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -89,10 +91,12 @@ function initialState(): GameState {
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function BreakoutGame() {
   const navigate = useNavigate();
+  const { isLoggedIn, username, token } = useAuth();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<GameState>(initialState());
   const keysRef = useRef<{ left: boolean; right: boolean }>({ left: false, right: false });
   const animFrameRef = useRef<number>(0);
+  const scoreSubmittedRef = useRef(false);
   const [displayState, setDisplayState] = useState({
     score: 0,
     lives: LIVES_INITIAL,
@@ -101,6 +105,25 @@ export default function BreakoutGame() {
     won: false,
     paused: false,
   });
+
+  // ── Auto-submit score on game over / win ────────────────────────────────────
+  useEffect(() => {
+    if ((displayState.gameOver || displayState.won) && displayState.score > 0 && !scoreSubmittedRef.current) {
+      if (isLoggedIn && username && token) {
+        scoreSubmittedRef.current = true;
+        submitScore(
+          {
+            game_id: 'breakout',
+            player_name: username,
+            score: displayState.score,
+            lines_cleared: 0,
+            level: 1,
+          },
+          token,
+        ).catch(() => {});
+      }
+    }
+  }, [displayState.gameOver, displayState.won, displayState.score, isLoggedIn, username, token]);
 
   // ── Drawing ─────────────────────────────────────────────────────────────────
   const draw = useCallback((ctx: CanvasRenderingContext2D, gs: GameState) => {
@@ -310,6 +333,7 @@ export default function BreakoutGame() {
   // ── Reset ───────────────────────────────────────────────────────────────────
   const handleRestart = useCallback(() => {
     stateRef.current = initialState();
+    scoreSubmittedRef.current = false;
     setDisplayState({ score: 0, lives: LIVES_INITIAL, started: false, gameOver: false, won: false, paused: false });
   }, []);
 

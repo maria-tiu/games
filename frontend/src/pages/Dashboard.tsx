@@ -68,7 +68,7 @@ export default function Dashboard() {
             <tr>
               <th>Game</th>
               <th>Number of players</th>
-              <th>Add to playlist</th>
+              <th>Playlist</th>
               <th>Play now</th>
               <th>Best score</th>
             </tr>
@@ -107,7 +107,7 @@ export default function Dashboard() {
                           : 'Add to playlist'
                       }
                     >
-                      {inPlaylist ? 'Added ✓' : addingGame === game.id ? 'Adding…' : 'Add to playlist'}
+                      {inPlaylist ? 'Added ✓' : addingGame === game.id ? '…' : 'Add'}
                     </button>
                   </td>
                   <td>

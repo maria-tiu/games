@@ -90,6 +90,15 @@ export default function SlidingPuzzle() {
     return () => clearInterval(timer);
   }, [running, won]);
 
+  const submitPuzzleScore = useCallback((completedMoves: number) => {
+    if (!isLoggedIn || !username || !token) return;
+    const puzzleScore = Math.max(0, 1000 - completedMoves);
+    submitScore(
+      { game_id: 'sliding-puzzle', player_name: username, score: puzzleScore, lines_cleared: completedMoves, level: size },
+      token,
+    ).catch(() => {});
+  }, [isLoggedIn, username, token, size]);
+
   const handleTileClick = (idx: number) => {
     if (won) return;
     const blankIdx = board.indexOf(0);
@@ -102,13 +111,7 @@ export default function SlidingPuzzle() {
     if (isSolved(newBoard, size)) {
       setWon(true);
       setRunning(false);
-      if (isLoggedIn && username && token) {
-        const puzzleScore = Math.max(0, 1000 - newMoves);
-        submitScore(
-          { game_id: 'sliding-puzzle', player_name: username, score: puzzleScore, lines_cleared: newMoves, level: size },
-          token,
-        ).catch(() => {});
-      }
+      submitPuzzleScore(newMoves);
     }
   };
 
@@ -145,16 +148,10 @@ export default function SlidingPuzzle() {
       if (isSolved(newBoard, size)) {
         setWon(true);
         setRunning(false);
-        if (isLoggedIn && username && token) {
-          const puzzleScore = Math.max(0, 1000 - newMoves);
-          submitScore(
-            { game_id: 'sliding-puzzle', player_name: username, score: puzzleScore, lines_cleared: newMoves, level: size },
-            token,
-          ).catch(() => {});
-        }
+        submitPuzzleScore(newMoves);
       }
     }
-  }, [board, size, moves, won, isLoggedIn, username, token]);
+  }, [board, size, moves, won, submitPuzzleScore]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);

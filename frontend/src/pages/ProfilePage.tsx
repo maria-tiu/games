@@ -29,7 +29,7 @@ export default function ProfilePage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
-  const [myBestScore, setMyBestScore] = useState<Record<string, number>>({}); 
+  const [myLastScores, setMyBestScore] = useState<Record<string, number>>({}); 
 
   // Edit state
   const [editingUsername, setEditingUsername] = useState(false);
@@ -260,8 +260,8 @@ export default function ProfilePage() {
                     )}
                   </td>
                   <td className="game-score">
-                    {myBestScore[entry.game_id] !== undefined
-                      ? myBestScore[entry.game_id]
+                    {myLastScores[entry.game_id] !== undefined
+                      ? myLastScores[entry.game_id]
                       : '—'}
                   </td>
                   <td>

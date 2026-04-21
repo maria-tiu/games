@@ -175,13 +175,15 @@ class UserScoreView(APIView):
 
     def get(self, request):
         """Return the most-recent score per game for the authenticated user."""
-        scores = Score.objects.filter(user=request.user).order_by('game_id', '-created_at')
-        seen: set[str] = set()
-        result = []
-        for s in scores:
-            if s.game_id not in seen:
-                seen.add(s.game_id)
-                result.append(s)
-        serializer = ScoreSerializer(result, many=True)
+        from django.db.models import Subquery, OuterRef
+        latest_id_per_game = (
+            Score.objects.filter(user=request.user, game_id=OuterRef('game_id'))
+            .order_by('-created_at')
+            .values('id')[:1]
+        )
+        scores = Score.objects.filter(
+            user=request.user, id=Subquery(latest_id_per_game)
+        ).order_by('game_id')
+        serializer = ScoreSerializer(scores, many=True)
         return Response(serializer.data)
 

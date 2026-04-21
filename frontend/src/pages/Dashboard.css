@@ -59,6 +59,31 @@
   font-weight: 700;
   color: #fff;
   font-size: 16px;
+  white-space: nowrap;
+  min-width: 160px;
+}
+
+.btn-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #00f0f0;
+  background: transparent;
+  color: #00f0f0;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  vertical-align: middle;
+  line-height: 1;
+  padding: 0;
+}
+
+.btn-info:hover {
+  background: rgba(0, 240, 240, 0.15);
 }
 
 .game-score {
@@ -67,8 +92,21 @@
   font-size: 18px;
 }
 
+.game-best-player {
+  font-size: 12px;
+  font-weight: 400;
+  color: #aaa;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+.game-score-none {
+  color: #555;
+}
+
 .btn-action {
-  padding: 8px 18px;
+  padding: 8px 0;
+  width: 90px;
   border: none;
   border-radius: 6px;
   cursor: pointer;

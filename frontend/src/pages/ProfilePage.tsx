@@ -3,11 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { usePlaylist } from '../context/usePlaylist';
 import { fetchUserProfile, updateUserProfile } from '../api/profile';
+import { fetchMyScores } from '../api/scores';
 import type { UserProfile } from '../api/profile';
+import GameInstructionsModal from '../components/GameInstructionsModal';
+import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
 import './ProfilePage.css';
 
 const GAME_ROUTES: Record<string, string> = {
   tetris: '/tetris',
+  'sliding-puzzle': '/sliding-puzzle',
   '2048': '/2048',
 };
 
@@ -26,6 +30,7 @@ export default function ProfilePage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [myLastScores, setMyLastScores] = useState<Record<string, number>>({});
 
   // Edit state
   const [editingUsername, setEditingUsername] = useState(false);
@@ -37,6 +42,7 @@ export default function ProfilePage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const [instructionsGameId, setInstructionsGameId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -53,6 +59,20 @@ export default function ProfilePage() {
       .catch(() => {})
       .finally(() => setLoadingProfile(false));
   }, [isLoggedIn, token, navigate]);
+
+  // Fetch the user's last score per game from the dedicated endpoint.
+  useEffect(() => {
+    if (!isLoggedIn || !token) return;
+    fetchMyScores(token)
+      .then((scores) => {
+        const map: Record<string, number> = {};
+        for (const s of scores) {
+          map[s.game_id] = s.score;
+        }
+        setMyLastScores(map);
+      })
+      .catch(() => {});
+  }, [isLoggedIn, token]);
 
   const handleSaveUsername = async () => {
     if (!token || !profile) return;
@@ -219,6 +239,7 @@ export default function ProfilePage() {
             <thead>
               <tr>
                 <th>Game</th>
+                <th>Last score</th>
                 <th>Play now</th>
                 <th>Remove</th>
               </tr>
@@ -226,7 +247,24 @@ export default function ProfilePage() {
             <tbody>
               {playlist.map((entry) => (
                 <tr key={entry.id}>
-                  <td className="game-name">{entry.game_name}</td>
+                  <td className="game-name">
+                    {entry.game_name}
+                    {entry.game_id in GAME_INSTRUCTIONS && (
+                      <button
+                        className="btn-info"
+                        onClick={() => setInstructionsGameId(entry.game_id)}
+                        title={`How to play ${entry.game_name}`}
+                        aria-label={`How to play ${entry.game_name}`}
+                      >
+                        ?
+                      </button>
+                    )}
+                  </td>
+                  <td className="game-score">
+                    {myLastScores[entry.game_id] !== undefined
+                      ? myLastScores[entry.game_id]
+                      : '—'}
+                  </td>
                   <td>
                     <button
                       className="btn-action btn-play"
@@ -251,6 +289,13 @@ export default function ProfilePage() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {instructionsGameId && (
+        <GameInstructionsModal
+          gameId={instructionsGameId}
+          onClose={() => setInstructionsGameId(null)}
+        />
       )}
     </div>
   );

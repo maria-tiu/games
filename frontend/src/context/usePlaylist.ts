@@ -6,3 +6,4 @@ export function usePlaylist() {
   if (!ctx) throw new Error('usePlaylist must be used within a PlaylistProvider component');
   return ctx;
 }
+

@@ -1,6 +1,8 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { use2048Game } from '../hooks/use2048Game';
+import { useAuth } from '../context/useAuth';
+import { submitScore } from '../api/scores';
 import './Game2048.css';
 
 function getTileClass(value: number | null): string {
@@ -11,8 +13,28 @@ function getTileClass(value: number | null): string {
 
 export default function Game2048() {
   const { state, move, reset, continueGame } = use2048Game();
+  const { isLoggedIn, username, token } = useAuth();
   const navigate = useNavigate();
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const [scoreSubmitted, setScoreSubmitted] = useState(false);
+
+  // Auto-submit score when game is over for logged-in users
+  useEffect(() => {
+    if (state.gameOver && state.score > 0 && !scoreSubmitted && isLoggedIn && username && token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setScoreSubmitted(true);
+      submitScore(
+        {
+          game_id: '2048',
+          player_name: username,
+          score: state.score,
+          lines_cleared: 0,
+          level: 1,
+        },
+        token,
+      ).catch(() => {});
+    }
+  }, [state.gameOver, state.score, scoreSubmitted, isLoggedIn, username, token]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -105,7 +127,7 @@ export default function Game2048() {
         <p className="game-2048-subtitle">
           Join the tiles, get to&nbsp;<strong>2048!</strong>
         </p>
-        <button className="btn-2048" onClick={reset}>
+        <button className="btn-2048" onClick={() => { setScoreSubmitted(false); reset(); }}>
           New Game
         </button>
       </div>
@@ -139,7 +161,7 @@ export default function Game2048() {
                 <div className="game-2048-overlay-title game-over-text">
                   Game Over!
                 </div>
-                <button className="btn-2048" onClick={reset}>
+                <button className="btn-2048" onClick={() => { setScoreSubmitted(false); reset(); }}>
                   Try Again
                 </button>
               </>
@@ -151,7 +173,7 @@ export default function Game2048() {
                 <button className="btn-2048" onClick={continueGame}>
                   Keep Going
                 </button>
-                <button className="btn-2048" onClick={reset}>
+                <button className="btn-2048" onClick={() => { setScoreSubmitted(false); reset(); }}>
                   New Game
                 </button>
               </>

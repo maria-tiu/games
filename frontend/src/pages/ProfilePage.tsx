@@ -8,6 +8,7 @@ import './ProfilePage.css';
 
 const GAME_ROUTES: Record<string, string> = {
   tetris: '/tetris',
+  '2048': '/2048',
 };
 
 function formatErrors(err: unknown): string {

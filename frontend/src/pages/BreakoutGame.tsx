@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { submitScore } from '../api/scores';
+import GameInstructionsModal from '../components/GameInstructionsModal';
 import './BreakoutGame.css';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -97,6 +98,8 @@ export default function BreakoutGame() {
   const keysRef = useRef<{ left: boolean; right: boolean }>({ left: false, right: false });
   const animFrameRef = useRef<number>(0);
   const scoreSubmittedRef = useRef(false);
+  // Holds the in-flight submitScore promise so the back button can await it.
+  const scorePromiseRef = useRef<Promise<void>>(Promise.resolve());
   // Keep latest auth values in a ref so the memoised game-loop step() can access them
   // without being recreated (which would restart the animation loop).
   const authRef = useRef({ isLoggedIn, username, token });
@@ -104,6 +107,7 @@ export default function BreakoutGame() {
     authRef.current = { isLoggedIn, username, token };
   }, [isLoggedIn, username, token]);
 
+  const [showInstructions, setShowInstructions] = useState(false);
   const [displayState, setDisplayState] = useState({
     score: 0,
     lives: LIVES_INITIAL,
@@ -164,7 +168,10 @@ export default function BreakoutGame() {
       const { isLoggedIn: li, username: un, token: tk } = authRef.current;
       if (score > 0 && li && un && tk && !scoreSubmittedRef.current) {
         scoreSubmittedRef.current = true;
-        submitScore({ game_id: 'breakout', player_name: un, score, lines_cleared: 0, level: 1 }, tk).catch(() => {});
+        scorePromiseRef.current = submitScore(
+          { game_id: 'breakout', player_name: un, score, lines_cleared: 0, level: 1 },
+          tk,
+        ).then(() => undefined).catch(() => undefined);
       }
     };
 
@@ -333,12 +340,28 @@ export default function BreakoutGame() {
   const handleRestart = useCallback(() => {
     stateRef.current = initialState();
     scoreSubmittedRef.current = false;
+    scorePromiseRef.current = Promise.resolve();
     setDisplayState({ score: 0, lives: LIVES_INITIAL, started: false, gameOver: false, won: false, paused: false });
   }, []);
 
+  // ── Back navigation ─────────────────────────────────────────────────────────
+  // Await any pending score submission so the Dashboard re-fetches after it completes.
+  const handleBack = useCallback(async () => {
+    await scorePromiseRef.current;
+    navigate('/');
+  }, [navigate]);
+
   return (
     <div className="breakout-page">
-      <button className="breakout-back-btn" onClick={() => navigate('/')}>← Back to Dashboard</button>
+      <div className="breakout-top-bar">
+        <button className="breakout-back-btn" onClick={() => void handleBack()}>← Back to Dashboard</button>
+        <button
+          className="btn-info breakout-info-btn"
+          onClick={() => setShowInstructions(true)}
+          title="How to play Breakout"
+          aria-label="How to play Breakout"
+        >?</button>
+      </div>
 
       <header className="breakout-header">
         <h1 className="breakout-title">BREAKOUT</h1>
@@ -399,6 +422,10 @@ export default function BreakoutGame() {
           </div>
         )}
       </div>
+
+      {showInstructions && (
+        <GameInstructionsModal gameId="breakout" onClose={() => setShowInstructions(false)} />
+      )}
     </div>
   );
 }

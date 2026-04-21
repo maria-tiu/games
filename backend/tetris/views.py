@@ -174,15 +174,20 @@ class UserScoreView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """Return the most-recent score per game for the authenticated user."""
-        from django.db.models import Subquery, OuterRef
+        """Return the most-recent score per game for the authenticated user.
+
+        Matches scores by user FK (new records) OR by player_name (legacy records
+        submitted before the user FK was added to the model).
+        """
+        from django.db.models import Subquery, OuterRef, Q
+        user_filter = Q(user=request.user) | Q(player_name=request.user.username)
         latest_id_per_game = (
-            Score.objects.filter(user=request.user, game_id=OuterRef('game_id'))
+            Score.objects.filter(user_filter, game_id=OuterRef('game_id'))
             .order_by('-created_at')
             .values('id')[:1]
         )
         scores = Score.objects.filter(
-            user=request.user, id=Subquery(latest_id_per_game)
+            user_filter, id=Subquery(latest_id_per_game)
         ).order_by('game_id')
         serializer = ScoreSerializer(scores, many=True)
         return Response(serializer.data)

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { use2048Game } from '../hooks/use2048Game';
 import { useAuth } from '../context/useAuth';
 import { submitScore } from '../api/scores';
+import GameInstructionsModal from '../components/GameInstructionsModal';
 import './Game2048.css';
 
 function getTileClass(value: number | null): string {
@@ -17,10 +18,13 @@ export default function Game2048() {
   const navigate = useNavigate();
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
+  const [instructionsOpen, setInstructionsOpen] = useState(false);
 
-  // Auto-submit score when game is over for logged-in users
+  // Auto-submit score when game ends (game over OR user wins and hasn't continued).
+  // This covers: reaching 2048 then clicking "New Game", and truly running out of moves.
   useEffect(() => {
-    if (state.gameOver && state.score > 0 && !scoreSubmitted && isLoggedIn && username && token) {
+    const gameEnded = state.gameOver || (state.won && !state.continueAfterWin);
+    if (gameEnded && state.score > 0 && !scoreSubmitted && isLoggedIn && username && token) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setScoreSubmitted(true);
       submitScore(
@@ -34,7 +38,7 @@ export default function Game2048() {
         token,
       ).catch(() => {});
     }
-  }, [state.gameOver, state.score, scoreSubmitted, isLoggedIn, username, token]);
+  }, [state.gameOver, state.won, state.continueAfterWin, state.score, scoreSubmitted, isLoggedIn, username, token]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -110,7 +114,17 @@ export default function Game2048() {
       </button>
 
       <div className="game-2048-header">
-        <h1 className="game-2048-title">2048</h1>
+        <h1 className="game-2048-title">
+          2048
+          <button
+            className="btn-info"
+            onClick={() => setInstructionsOpen(true)}
+            title="How to play 2048"
+            aria-label="How to play 2048"
+          >
+            ?
+          </button>
+        </h1>
         <div className="game-2048-scores">
           <div className="score-box">
             <div className="score-box-label">Score</div>
@@ -170,7 +184,7 @@ export default function Game2048() {
                 <div className="game-2048-overlay-title you-win-text">
                   You Win!
                 </div>
-                <button className="btn-2048" onClick={continueGame}>
+                <button className="btn-2048" onClick={() => { setScoreSubmitted(false); continueGame(); }}>
                   Keep Going
                 </button>
                 <button className="btn-2048" onClick={() => { setScoreSubmitted(false); reset(); }}>
@@ -187,6 +201,13 @@ export default function Game2048() {
         On mobile, <strong>swipe</strong> to move. When two tiles with the same
         number touch, they merge into one!
       </p>
+
+      {instructionsOpen && (
+        <GameInstructionsModal
+          gameId="2048"
+          onClose={() => setInstructionsOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -97,6 +97,12 @@
   background-color: #6d28d9;
 }
 
+.btn-added {
+  background-color: #1a4a1a;
+  color: #4ade80;
+  border: 1px solid #4ade80;
+}
+
 .btn-play {
   background-color: #00f0f0;
   color: #111;

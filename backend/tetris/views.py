@@ -10,8 +10,15 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
-from .models import Score
-from .serializers import ScoreSerializer, RegisterSerializer, PasswordResetSerializer, PasswordResetConfirmSerializer
+from .models import Score, UserGame
+from .serializers import (
+    ScoreSerializer,
+    RegisterSerializer,
+    PasswordResetSerializer,
+    PasswordResetConfirmSerializer,
+    UserGameSerializer,
+    UserProfileSerializer,
+)
 
 
 class ScoreListCreateView(generics.ListCreateAPIView):
@@ -100,4 +107,56 @@ class PasswordResetConfirmView(APIView):
             user.save()
             return Response({'detail': 'Password has been reset.'})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserGameListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        games = UserGame.objects.filter(user=request.user)
+        serializer = UserGameSerializer(games, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        game_id = request.data.get('game_id', '').strip()
+        game_name = request.data.get('game_name', '').strip()
+        if not game_id or not game_name:
+            return Response(
+                {'detail': 'game_id and game_name are required.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        user_game, created = UserGame.objects.get_or_create(
+            user=request.user,
+            game_id=game_id,
+            defaults={'game_name': game_name},
+        )
+        serializer = UserGameSerializer(user_game)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
+class UserGameDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            user_game = UserGame.objects.get(pk=pk, user=request.user)
+        except UserGame.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        user_game.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 

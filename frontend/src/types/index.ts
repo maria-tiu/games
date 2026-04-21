@@ -29,6 +29,7 @@ export interface GameState {
 
 export interface ScoreEntry {
   id: number;
+  game_id: string;
   player_name: string;
   score: number;
   lines_cleared: number;
@@ -37,6 +38,7 @@ export interface ScoreEntry {
 }
 
 export interface ScoreSubmission {
+  game_id: string;
   player_name: string;
   score: number;
   lines_cleared: number;

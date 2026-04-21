@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 
 class Score(models.Model):
+    game_id = models.CharField(max_length=50, default='tetris')
     player_name = models.CharField(max_length=50)
     score = models.IntegerField()
     lines_cleared = models.IntegerField(default=0)

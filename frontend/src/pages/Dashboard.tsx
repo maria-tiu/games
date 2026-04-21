@@ -29,23 +29,17 @@ export default function Dashboard() {
   const [instructionsGameId, setInstructionsGameId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchHighScores()
-      .then((scores) => {
-        if (scores.length > 0) {
-          // The scores API currently returns only Tetris scores (no game_id field).
-          // We populate the map using each game's own id as the key so the table
-          // stays data-driven even if more games with separate endpoints are added.
-          const map: Record<string, ScoreEntry> = {};
-          for (const game of GAMES) {
-            const top = scores[0]; // API returns scores sorted by score desc
-            if (top) map[game.id] = top;
-          }
-          setBestScores(map);
-        }
-      })
-      .catch(() => {
-        // ignore — best score column will simply be empty
-      });
+    const map: Record<string, ScoreEntry> = {};
+    const fetches = GAMES.map((game) =>
+      fetchHighScores(game.id)
+        .then((scores) => {
+          if (scores.length > 0) map[game.id] = scores[0];
+        })
+        .catch(() => {
+          // ignore — best score column will simply be empty for this game
+        })
+    );
+    Promise.all(fetches).then(() => setBestScores({ ...map }));
   }, []);
 
   const handlePlay = (game: Game) => {

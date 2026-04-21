@@ -25,7 +25,11 @@ class ScoreListCreateView(generics.ListCreateAPIView):
     serializer_class = ScoreSerializer
 
     def get_queryset(self):
-        return Score.objects.all()[:10]
+        game_id = self.request.query_params.get('game_id')
+        qs = Score.objects.all()
+        if game_id:
+            qs = qs.filter(game_id=game_id)
+        return qs[:10]
 
 
 class RegisterView(APIView):

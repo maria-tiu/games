@@ -36,7 +36,7 @@ export default function TetrisGame() {
     try {
       setScoresLoading(true);
       setScoresError(null);
-      const data = await fetchHighScores();
+      const data = await fetchHighScores('tetris');
       setHighScores(data);
     } catch {
       setScoresError('Could not load scores');
@@ -116,6 +116,7 @@ export default function TetrisGame() {
     setSubmitting(true);
     try {
       await submitScore({
+        game_id: 'tetris',
         player_name: name,
         score: gameState.score,
         lines_cleared: gameState.linesCleared,

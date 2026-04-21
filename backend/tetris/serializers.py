@@ -7,7 +7,7 @@ from .models import Score, UserGame
 class ScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Score
-        fields = ['id', 'player_name', 'score', 'lines_cleared', 'level', 'created_at']
+        fields = ['id', 'game_id', 'player_name', 'score', 'lines_cleared', 'level', 'created_at']
         read_only_fields = ['id', 'created_at']
 
 

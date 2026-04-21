@@ -59,31 +59,24 @@ export default function ProfilePage() {
       .finally(() => setLoadingProfile(false));
   }, [isLoggedIn, token, navigate]);
 
-  // Fetch all high scores and derive the user's personal best per game.
-  // Note: ScoreEntry has no game_id field — all scores in the current API
-  // are Tetris scores, so we map them under each playlist game's game_id.
+  // Fetch high scores filtered by each playlist game and derive the user's personal best per game.
   useEffect(() => {
-    if (!isLoggedIn || !username) return;
-    fetchHighScores()
-      .then((scores) => {
-        const myScores: Record<string, number> = {};
-        for (const s of scores) {
-          if (s.player_name === username) {
-            // Map the score under every game_id from the user's playlist
-            // (since the API returns a single pool of Tetris scores).
-            for (const entry of playlist) {
-              if (
-                myScores[entry.game_id] === undefined ||
-                s.score > myScores[entry.game_id]
-              ) {
+    if (!isLoggedIn || !username || playlist.length === 0) return;
+    const myScores: Record<string, number> = {};
+    const fetches = playlist.map((entry) =>
+      fetchHighScores(entry.game_id)
+        .then((scores) => {
+          for (const s of scores) {
+            if (s.player_name === username) {
+              if (myScores[entry.game_id] === undefined || s.score > myScores[entry.game_id]) {
                 myScores[entry.game_id] = s.score;
               }
             }
           }
-        }
-        setMyBestScore(myScores);
-      })
-      .catch(() => {});
+        })
+        .catch(() => {})
+    );
+    Promise.all(fetches).then(() => setMyBestScore({ ...myScores }));
   }, [isLoggedIn, username, playlist]);
 
   const handleSaveUsername = async () => {

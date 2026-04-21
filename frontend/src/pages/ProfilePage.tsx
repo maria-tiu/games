@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { usePlaylist } from '../context/usePlaylist';
 import { fetchUserProfile, updateUserProfile } from '../api/profile';
+import { fetchHighScores } from '../api/scores';
 import type { UserProfile } from '../api/profile';
 import './ProfilePage.css';
 
@@ -25,6 +26,7 @@ export default function ProfilePage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [myBestScore, setMyBestScore] = useState<Record<string, number>>({});
 
   // Edit state
   const [editingUsername, setEditingUsername] = useState(false);
@@ -52,6 +54,25 @@ export default function ProfilePage() {
       .catch(() => {})
       .finally(() => setLoadingProfile(false));
   }, [isLoggedIn, token, navigate]);
+
+  // Fetch all high scores and derive the user's personal best per game
+  useEffect(() => {
+    if (!isLoggedIn || !username) return;
+    fetchHighScores()
+      .then((scores) => {
+        const myScores: Record<string, number> = {};
+        for (const s of scores) {
+          if (s.player_name === username) {
+            // Only one game (tetris) for now; use game_id key "tetris"
+            if (myScores['tetris'] === undefined || s.score > myScores['tetris']) {
+              myScores['tetris'] = s.score;
+            }
+          }
+        }
+        setMyBestScore(myScores);
+      })
+      .catch(() => {});
+  }, [isLoggedIn, username]);
 
   const handleSaveUsername = async () => {
     if (!token || !profile) return;
@@ -218,6 +239,7 @@ export default function ProfilePage() {
             <thead>
               <tr>
                 <th>Game</th>
+                <th>My score</th>
                 <th>Play now</th>
                 <th>Remove</th>
               </tr>
@@ -226,6 +248,11 @@ export default function ProfilePage() {
               {playlist.map((entry) => (
                 <tr key={entry.id}>
                   <td className="game-name">{entry.game_name}</td>
+                  <td className="game-score">
+                    {myBestScore[entry.game_id] !== undefined
+                      ? myBestScore[entry.game_id]
+                      : '—'}
+                  </td>
                   <td>
                     <button
                       className="btn-action btn-play"

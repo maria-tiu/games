@@ -7,12 +7,18 @@
   border-bottom: 2px solid #00f0f0;
 }
 
-.navbar-brand {
+.navbar-brand-link {
   font-size: 22px;
   font-weight: 900;
   letter-spacing: 4px;
   color: #00f0f0;
   text-shadow: 0 0 10px rgba(0, 240, 240, 0.5);
+  text-decoration: none;
+  transition: text-shadow 0.2s;
+}
+
+.navbar-brand-link:hover {
+  text-shadow: 0 0 16px rgba(0, 240, 240, 0.8);
 }
 
 .navbar-links {
@@ -39,6 +45,21 @@
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.theme-toggle-btn {
+  background: transparent;
+  border: 1px solid #00f0f0;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: background 0.2s;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(0, 240, 240, 0.1);
 }
 
 .navbar-username {

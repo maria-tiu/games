@@ -97,6 +97,13 @@ export default function BreakoutGame() {
   const keysRef = useRef<{ left: boolean; right: boolean }>({ left: false, right: false });
   const animFrameRef = useRef<number>(0);
   const scoreSubmittedRef = useRef(false);
+  // Keep latest auth values in a ref so the memoised game-loop step() can access them
+  // without being recreated (which would restart the animation loop).
+  const authRef = useRef({ isLoggedIn, username, token });
+  useEffect(() => {
+    authRef.current = { isLoggedIn, username, token };
+  }, [isLoggedIn, username, token]);
+
   const [displayState, setDisplayState] = useState({
     score: 0,
     lives: LIVES_INITIAL,
@@ -105,25 +112,6 @@ export default function BreakoutGame() {
     won: false,
     paused: false,
   });
-
-  // ── Auto-submit score on game over / win ────────────────────────────────────
-  useEffect(() => {
-    if ((displayState.gameOver || displayState.won) && displayState.score > 0 && !scoreSubmittedRef.current) {
-      if (isLoggedIn && username && token) {
-        scoreSubmittedRef.current = true;
-        submitScore(
-          {
-            game_id: 'breakout',
-            player_name: username,
-            score: displayState.score,
-            lines_cleared: 0,
-            level: 1,
-          },
-          token,
-        ).catch(() => {});
-      }
-    }
-  }, [displayState.gameOver, displayState.won, displayState.score, isLoggedIn, username, token]);
 
   // ── Drawing ─────────────────────────────────────────────────────────────────
   const draw = useCallback((ctx: CanvasRenderingContext2D, gs: GameState) => {
@@ -171,6 +159,15 @@ export default function BreakoutGame() {
     const gs = stateRef.current;
     if (!gs.started || gs.gameOver || gs.won || gs.paused) return;
 
+    // Submit score via ref so we don't need auth values in the dependency array
+    const trySubmitScore = (score: number) => {
+      const { isLoggedIn: li, username: un, token: tk } = authRef.current;
+      if (score > 0 && li && un && tk && !scoreSubmittedRef.current) {
+        scoreSubmittedRef.current = true;
+        submitScore({ game_id: 'breakout', player_name: un, score, lines_cleared: 0, level: 1 }, tk).catch(() => {});
+      }
+    };
+
     // Paddle movement (keyboard)
     if (keysRef.current.left) gs.paddleX = Math.max(0, gs.paddleX - PADDLE_SPEED);
     if (keysRef.current.right) gs.paddleX = Math.min(CANVAS_WIDTH - PADDLE_WIDTH, gs.paddleX + PADDLE_SPEED);
@@ -215,6 +212,7 @@ export default function BreakoutGame() {
       gs.lives -= 1;
       if (gs.lives <= 0) {
         gs.gameOver = true;
+        trySubmitScore(gs.score);
       } else {
         // Reset ball on paddle
         gs.ballX = gs.paddleX + PADDLE_WIDTH / 2;
@@ -262,6 +260,7 @@ export default function BreakoutGame() {
     // Win condition
     if (gs.bricks.every((b) => !b.alive)) {
       gs.won = true;
+      trySubmitScore(gs.score);
       setDisplayState((d) => ({ ...d, won: true }));
     }
   }, []);

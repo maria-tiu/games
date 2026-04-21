@@ -8,6 +8,7 @@ import Layout from './components/Layout.tsx'
 import Dashboard from './pages/Dashboard.tsx'
 import AuthPage from './pages/AuthPage.tsx'
 import TetrisGame from './pages/TetrisGame.tsx'
+import BreakoutGame from './pages/BreakoutGame.tsx'
 import ProfilePage from './pages/ProfilePage.tsx'
 
 createRoot(document.getElementById('root')!).render(
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="profile" element={<ProfilePage />} />
             </Route>
             <Route path="/tetris" element={<TetrisGame />} />
+            <Route path="/breakout" element={<BreakoutGame />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

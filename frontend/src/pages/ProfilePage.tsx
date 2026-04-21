@@ -8,6 +8,7 @@ import './ProfilePage.css';
 
 const GAME_ROUTES: Record<string, string> = {
   tetris: '/tetris',
+  breakout: '/breakout',
 };
 
 function formatErrors(err: unknown): string {

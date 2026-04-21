@@ -14,6 +14,7 @@ interface Game {
 
 const GAMES: Game[] = [
   { id: 'tetris', name: 'Tetris', players: 1, route: '/tetris', score: 0 },
+  { id: 'breakout', name: 'Breakout', players: 1, route: '/breakout', score: 0 },
 ];
 
 export default function Dashboard() {

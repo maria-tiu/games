@@ -23,6 +23,7 @@ from .serializers import (
 
 class ScoreListCreateView(generics.ListCreateAPIView):
     serializer_class = ScoreSerializer
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         game_id = self.request.query_params.get('game_id')
@@ -30,6 +31,10 @@ class ScoreListCreateView(generics.ListCreateAPIView):
         if game_id:
             qs = qs.filter(game_id=game_id)
         return qs[:10]
+
+    def perform_create(self, serializer):
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(user=user)
 
 
 class RegisterView(APIView):
@@ -163,4 +168,20 @@ class UserGameDetailView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         user_game.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserScoreView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Return the most-recent score per game for the authenticated user."""
+        scores = Score.objects.filter(user=request.user).order_by('game_id', '-created_at')
+        seen: set[str] = set()
+        result = []
+        for s in scores:
+            if s.game_id not in seen:
+                seen.add(s.game_id)
+                result.append(s)
+        serializer = ScoreSerializer(result, many=True)
+        return Response(serializer.data)
 

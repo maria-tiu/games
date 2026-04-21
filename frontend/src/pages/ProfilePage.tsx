@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { usePlaylist } from '../context/usePlaylist';
 import { fetchUserProfile, updateUserProfile } from '../api/profile';
-import { fetchHighScores } from '../api/scores';
+import { fetchMyScores } from '../api/scores';
 import type { UserProfile } from '../api/profile';
 import GameInstructionsModal from '../components/GameInstructionsModal';
 import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
@@ -29,7 +29,7 @@ export default function ProfilePage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
-  const [myBestScore, setMyBestScore] = useState<Record<string, number>>({});
+  const [myBestScore, setMyBestScore] = useState<Record<string, number>>({}); 
 
   // Edit state
   const [editingUsername, setEditingUsername] = useState(false);
@@ -59,25 +59,19 @@ export default function ProfilePage() {
       .finally(() => setLoadingProfile(false));
   }, [isLoggedIn, token, navigate]);
 
-  // Fetch high scores filtered by each playlist game and derive the user's personal best per game.
+  // Fetch the user's last score per game from the dedicated endpoint.
   useEffect(() => {
-    if (!isLoggedIn || !username || playlist.length === 0) return;
-    const myScores: Record<string, number> = {};
-    const fetches = playlist.map((entry) =>
-      fetchHighScores(entry.game_id)
-        .then((scores) => {
-          for (const s of scores) {
-            if (s.player_name === username) {
-              if (myScores[entry.game_id] === undefined || s.score > myScores[entry.game_id]) {
-                myScores[entry.game_id] = s.score;
-              }
-            }
-          }
-        })
-        .catch(() => {})
-    );
-    Promise.all(fetches).then(() => setMyBestScore({ ...myScores }));
-  }, [isLoggedIn, username, playlist]);
+    if (!isLoggedIn || !token) return;
+    fetchMyScores(token)
+      .then((scores) => {
+        const map: Record<string, number> = {};
+        for (const s of scores) {
+          map[s.game_id] = s.score;
+        }
+        setMyBestScore(map);
+      })
+      .catch(() => {});
+  }, [isLoggedIn, token]);
 
   const handleSaveUsername = async () => {
     if (!token || !profile) return;
@@ -244,7 +238,7 @@ export default function ProfilePage() {
             <thead>
               <tr>
                 <th>Game</th>
-                <th>My score</th>
+                <th>Last score</th>
                 <th>Play now</th>
                 <th>Remove</th>
               </tr>

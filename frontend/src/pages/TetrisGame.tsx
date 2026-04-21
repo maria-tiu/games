@@ -5,6 +5,7 @@ import NextPiece from '../components/NextPiece';
 import GameInfo from '../components/GameInfo';
 import HighScores, { ScoreSubmitForm } from '../components/HighScores';
 import { useTetrisGame } from '../hooks/useTetrisGame';
+import { useAuth } from '../context/useAuth';
 import { fetchHighScores, submitScore } from '../api/scores';
 import type { ScoreEntry } from '../types';
 import '../App.css';
@@ -22,6 +23,7 @@ export default function TetrisGame() {
     dropInterval,
   } = useTetrisGame();
 
+  const { isLoggedIn, username, token } = useAuth();
   const navigate = useNavigate();
   const dropTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -52,10 +54,31 @@ export default function TetrisGame() {
 
   useEffect(() => {
     if (gameState.isGameOver && gameState.score > 0 && !scoreSubmitted) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setShowSubmitForm(true);
+      if (isLoggedIn && username && token) {
+        // Auto-submit score for logged-in users
+        setSubmitting(true);
+        submitScore(
+          {
+            game_id: 'tetris',
+            player_name: username,
+            score: gameState.score,
+            lines_cleared: gameState.linesCleared,
+            level: gameState.level,
+          },
+          token,
+        )
+          .then(() => {
+            setScoreSubmitted(true);
+            return loadHighScores();
+          })
+          .catch(() => {})
+          .finally(() => setSubmitting(false));
+      } else {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setShowSubmitForm(true);
+      }
     }
-  }, [gameState.isGameOver, gameState.score, scoreSubmitted]);
+  }, [gameState.isGameOver, gameState.score, scoreSubmitted, isLoggedIn, username, token, gameState.linesCleared, gameState.level, loadHighScores]);
 
   useEffect(() => {
     if (dropTimerRef.current) {
@@ -115,13 +138,16 @@ export default function TetrisGame() {
   const handleSubmitScore = useCallback(async (name: string) => {
     setSubmitting(true);
     try {
-      await submitScore({
-        game_id: 'tetris',
-        player_name: name,
-        score: gameState.score,
-        lines_cleared: gameState.linesCleared,
-        level: gameState.level,
-      });
+      await submitScore(
+        {
+          game_id: 'tetris',
+          player_name: name,
+          score: gameState.score,
+          lines_cleared: gameState.linesCleared,
+          level: gameState.level,
+        },
+        token ?? undefined,
+      );
       setScoreSubmitted(true);
       setShowSubmitForm(false);
       await loadHighScores();
@@ -130,7 +156,7 @@ export default function TetrisGame() {
     } finally {
       setSubmitting(false);
     }
-  }, [gameState.score, gameState.linesCleared, gameState.level, loadHighScores]);
+  }, [gameState.score, gameState.linesCleared, gameState.level, token, loadHighScores]);
 
   const ghostPosition =
     gameState.currentPiece

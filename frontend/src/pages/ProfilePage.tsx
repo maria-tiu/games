@@ -5,6 +5,7 @@ import { usePlaylist } from '../context/usePlaylist';
 import { fetchUserProfile, updateUserProfile } from '../api/profile';
 import { fetchMyScores } from '../api/scores';
 import type { UserProfile } from '../api/profile';
+import type { ScoreEntry } from '../types';
 import GameInstructionsModal from '../components/GameInstructionsModal';
 import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
 import './ProfilePage.css';
@@ -12,6 +13,11 @@ import './ProfilePage.css';
 const GAME_ROUTES: Record<string, string> = {
   tetris: '/tetris',
   'sliding-puzzle': '/sliding-puzzle',
+};
+
+const GAME_NAMES: Record<string, string> = {
+  tetris: 'Tetris',
+  'sliding-puzzle': 'Sliding Puzzle',
 };
 
 function formatErrors(err: unknown): string {
@@ -22,6 +28,14 @@ function formatErrors(err: unknown): string {
     .join(' ');
 }
 
+function formatDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' });
+  } catch {
+    return iso;
+  }
+}
+
 export default function ProfilePage() {
   const { isLoggedIn, username, token, updateUsername } = useAuth();
   const { playlist, removeGame } = usePlaylist();
@@ -29,7 +43,8 @@ export default function ProfilePage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
-  const [myLastScores, setMyBestScore] = useState<Record<string, number>>({}); 
+  const [myScores, setMyScores] = useState<ScoreEntry[]>([]);
+  const [scoresLoading, setScoresLoading] = useState(true);
 
   // Edit state
   const [editingUsername, setEditingUsername] = useState(false);
@@ -42,6 +57,12 @@ export default function ProfilePage() {
 
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [instructionsGameId, setInstructionsGameId] = useState<string | null>(null);
+
+  // Derived map: game_id -> last score (for use in playlist table)
+  const myLastScores: Record<string, number> = {};
+  for (const s of myScores) {
+    myLastScores[s.game_id] = s.score;
+  }
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -62,15 +83,11 @@ export default function ProfilePage() {
   // Fetch the user's last score per game from the dedicated endpoint.
   useEffect(() => {
     if (!isLoggedIn || !token) return;
+    setScoresLoading(true);
     fetchMyScores(token)
-      .then((scores) => {
-        const map: Record<string, number> = {};
-        for (const s of scores) {
-          map[s.game_id] = s.score;
-        }
-        setMyBestScore(map);
-      })
-      .catch(() => {});
+      .then((scores) => setMyScores(scores))
+      .catch(() => {})
+      .finally(() => setScoresLoading(false));
   }, [isLoggedIn, token]);
 
   const handleSaveUsername = async () => {
@@ -222,6 +239,51 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      <h3 className="profile-section-title">My Scores</h3>
+
+      {scoresLoading ? (
+        <p className="profile-loading">Loading scores…</p>
+      ) : myScores.length === 0 ? (
+        <p className="profile-empty">No scores yet. Play a game to record your first score!</p>
+      ) : (
+        <div className="profile-table-wrapper">
+          <table className="profile-table">
+            <thead>
+              <tr>
+                <th>Game</th>
+                <th>Last score</th>
+                <th>Played on</th>
+                <th>Play now</th>
+              </tr>
+            </thead>
+            <tbody>
+              {myScores.map((entry) => {
+                const gameName = GAME_NAMES[entry.game_id] ?? entry.game_id;
+                const route = GAME_ROUTES[entry.game_id];
+                return (
+                  <tr key={entry.game_id}>
+                    <td className="game-name">{gameName}</td>
+                    <td className="game-score">{entry.score}</td>
+                    <td>{formatDate(entry.created_at)}</td>
+                    <td>
+                      {route && (
+                        <button
+                          className="btn-action btn-play"
+                          onClick={() => navigate(route)}
+                          title={`Play ${gameName}`}
+                        >
+                          Play
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
 

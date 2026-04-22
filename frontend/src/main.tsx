@@ -14,6 +14,7 @@ import SlidingPuzzle from './pages/SlidingPuzzle.tsx'
 import Game2048 from './pages/Game2048.tsx'
 import BreakoutGame from './pages/BreakoutGame.tsx'
 import MarioGame from './pages/MarioGame.tsx'
+import PacmanGame from './pages/PacmanGame.tsx'
 import ProfilePage from './pages/ProfilePage.tsx'
 
 createRoot(document.getElementById('root')!).render(
@@ -33,6 +34,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/2048" element={<Game2048 />} />
               <Route path="/breakout" element={<BreakoutGame />} />
               <Route path="/mario" element={<MarioGame />} />
+              <Route path="/pacman" element={<PacmanGame />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>

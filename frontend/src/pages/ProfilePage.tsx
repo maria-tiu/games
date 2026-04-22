@@ -12,6 +12,7 @@ import './ProfilePage.css';
 const GAME_ROUTES: Record<string, string> = {
   tetris: '/tetris',
   'sliding-puzzle': '/sliding-puzzle',
+  '2048': '/2048',
   breakout: '/breakout',
 };
 

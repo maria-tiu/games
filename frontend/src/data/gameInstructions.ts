@@ -42,6 +42,22 @@ export const GAME_INSTRUCTIONS: Record<string, GameInstructionsData> = {
       'Choose a smaller grid (3×3) to practice before trying 4×4 or 5×5.',
     ],
   },
+  '2048': {
+    title: 'How to play 2048',
+    description:
+      'Slide tiles on a 4×4 grid to merge matching numbers. Each merge doubles the tile value. Reach the 2048 tile to win — then keep going for an even higher score!',
+    controls: [
+      { key: '← →', action: 'Slide all tiles left / right' },
+      { key: '↑ ↓', action: 'Slide all tiles up / down' },
+      { key: 'W A S D', action: 'Alternative move keys' },
+      { key: 'Swipe', action: 'Swipe on touch screens to move tiles' },
+    ],
+    tips: [
+      'Keep your highest tile in a corner and build around it.',
+      'Try to maintain a consistent direction for most moves.',
+      'After reaching 2048, choose "Keep Going" to aim for 4096 or higher.',
+    ],
+  },
   breakout: {
     title: 'How to play Breakout',
     description:

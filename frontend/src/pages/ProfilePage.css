@@ -304,14 +304,6 @@
   min-width: 24px;
 }
 
-.score-popup-name {
-  flex: 1;
-  color: #ddd;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .score-popup-value {
   font-weight: 700;
   color: #00f0f0;

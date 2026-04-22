@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { use2048Game } from '../hooks/use2048Game';
 import { useAuth } from '../context/useAuth';
 import { submitScore } from '../api/scores';
-import GameInstructionsModal from '../components/GameInstructionsModal';
+import GameInfoButton from '../components/GameInfoButton';
 import './Game2048.css';
 
 function getTileClass(value: number | null): string {
@@ -18,7 +18,6 @@ export default function Game2048() {
   const navigate = useNavigate();
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
-  const [instructionsOpen, setInstructionsOpen] = useState(false);
 
   // Auto-submit score when game ends (game over OR user wins and hasn't continued).
   // This covers: reaching 2048 then clicking "New Game", and truly running out of moves.
@@ -116,14 +115,7 @@ export default function Game2048() {
       <div className="game-2048-header">
         <h1 className="game-2048-title">
           2048
-          <button
-            className="btn-info"
-            onClick={() => setInstructionsOpen(true)}
-            title="How to play 2048"
-            aria-label="How to play 2048"
-          >
-            ?
-          </button>
+          <GameInfoButton gameId="2048" />
         </h1>
         <div className="game-2048-scores">
           <div className="score-box">
@@ -201,13 +193,6 @@ export default function Game2048() {
         On mobile, <strong>swipe</strong> to move. When two tiles with the same
         number touch, they merge into one!
       </p>
-
-      {instructionsOpen && (
-        <GameInstructionsModal
-          gameId="2048"
-          onClose={() => setInstructionsOpen(false)}
-        />
-      )}
     </div>
   );
 }

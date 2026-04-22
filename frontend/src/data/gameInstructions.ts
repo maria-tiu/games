@@ -58,4 +58,20 @@ export const GAME_INSTRUCTIONS: Record<string, GameInstructionsData> = {
       'After reaching 2048, choose "Keep Going" to aim for 4096 or higher.',
     ],
   },
+  breakout: {
+    title: 'How to play Breakout',
+    description:
+      'Use the paddle to keep the ball in play and destroy all the bricks at the top of the screen. You have 3 lives — each time the ball falls below the paddle you lose one. Clear all bricks to win!',
+    controls: [
+      { key: '← →', action: 'Move the paddle left / right' },
+      { key: 'Mouse', action: 'Move the paddle with the mouse' },
+      { key: 'Space / Click', action: 'Launch the ball' },
+      { key: 'P', action: 'Pause / Resume' },
+    ],
+    tips: [
+      'Hit the ball near the edges of the paddle to send it at a sharper angle.',
+      'Top rows are worth more points — aim for them early.',
+      'Watch the ball\'s trajectory before launching so you can plan your position.',
+    ],
+  },
 };

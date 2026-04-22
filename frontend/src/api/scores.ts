@@ -1,6 +1,9 @@
 import type { ScoreEntry, ScoreSubmission } from '../types';
 
-const API_BASE = 'http://localhost:8000/api';
+const _envBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+const API_BASE = _envBase
+  ? _envBase.replace(/\/auth$/, '')
+  : 'http://localhost:8000/api';
 
 export async function fetchHighScores(gameId?: string): Promise<ScoreEntry[]> {
   const url = gameId

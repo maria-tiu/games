@@ -4,7 +4,7 @@ import { useAuth } from '../context/useAuth';
 import { usePlaylist } from '../context/usePlaylist';
 import { fetchHighScores } from '../api/scores';
 import type { ScoreEntry } from '../types';
-import GameInstructionsModal from '../components/GameInstructionsModal';
+import GameInfoButton from '../components/GameInfoButton';
 import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
 import './Dashboard.css';
 
@@ -19,6 +19,7 @@ const GAMES: Game[] = [
   { id: 'tetris', name: 'Tetris', players: 1, route: '/tetris' },
   { id: 'sliding-puzzle', name: 'Sliding Puzzle', players: 1, route: '/sliding-puzzle' },
   { id: '2048', name: '2048', players: 1, route: '/2048' },
+  { id: 'breakout', name: 'Breakout', players: 1, route: '/breakout' },
 ];
 
 export default function Dashboard() {
@@ -27,7 +28,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [addingGame, setAddingGame] = useState<string | null>(null);
   const [bestScores, setBestScores] = useState<Record<string, ScoreEntry>>({});
-  const [instructionsGameId, setInstructionsGameId] = useState<string | null>(null);
 
   useEffect(() => {
     const map: Record<string, ScoreEntry> = {};
@@ -83,16 +83,7 @@ export default function Dashboard() {
                 <tr key={game.id}>
                   <td className="game-name">
                     {game.name}
-                    {hasInstructions && (
-                      <button
-                        className="btn-info"
-                        onClick={() => setInstructionsGameId(game.id)}
-                        title={`How to play ${game.name}`}
-                        aria-label={`How to play ${game.name}`}
-                      >
-                        ?
-                      </button>
-                    )}
+                    {hasInstructions && <GameInfoButton gameId={game.id} />}
                   </td>
                   <td>{game.players}</td>
                   <td>
@@ -143,13 +134,6 @@ export default function Dashboard() {
         </p>
       )}
 
-      {instructionsGameId && (
-        <GameInstructionsModal
-          gameId={instructionsGameId}
-          onClose={() => setInstructionsGameId(null)}
-        />
-      )}
     </div>
   );
 }
-

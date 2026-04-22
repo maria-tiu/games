@@ -5,8 +5,10 @@ import NextPiece from '../components/NextPiece';
 import GameInfo from '../components/GameInfo';
 import HighScores, { ScoreSubmitForm } from '../components/HighScores';
 import { useTetrisGame } from '../hooks/useTetrisGame';
+import { useTetrisSound } from '../hooks/useTetrisSound';
 import { useAuth } from '../context/useAuth';
 import { fetchHighScores, submitScore } from '../api/scores';
+import { isValidPosition } from '../utils/gameHelpers';
 import type { ScoreEntry } from '../types';
 import '../App.css';
 
@@ -23,6 +25,21 @@ export default function TetrisGame() {
     dropInterval,
   } = useTetrisGame();
 
+  const {
+    isMuted,
+    startMusic,
+    stopMusic,
+    pauseMusic,
+    resumeMusic,
+    playMove,
+    playRotate,
+    playDrop,
+    playClear,
+    playLevelUp,
+    playGameOver,
+    toggleMute,
+  } = useTetrisSound();
+
   const { isLoggedIn, username, token } = useAuth();
   const navigate = useNavigate();
   const dropTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -33,6 +50,12 @@ export default function TetrisGame() {
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
+
+  // Track previous game state values to detect events
+  const prevLinesRef = useRef(gameState.linesCleared);
+  const prevLevelRef = useRef(gameState.level);
+  const prevIsGameOverRef = useRef(gameState.isGameOver);
+  const prevIsPausedRef = useRef(gameState.isPaused);
 
   const loadHighScores = useCallback(async () => {
     try {
@@ -97,43 +120,125 @@ export default function TetrisGame() {
   }, [gameState.isGameOver, gameState.isPaused, dropInterval, moveDown]);
 
   useEffect(() => {
+    const linesNow = gameState.linesCleared;
+    const levelNow = gameState.level;
+    const isGameOverNow = gameState.isGameOver;
+    const isPausedNow = gameState.isPaused;
+
+    const linesAdded = linesNow - prevLinesRef.current;
+    const levelUp = levelNow > prevLevelRef.current;
+    const justGameOver = isGameOverNow && !prevIsGameOverRef.current;
+    const justPaused = isPausedNow && !prevIsPausedRef.current;
+    const justResumed = !isPausedNow && prevIsPausedRef.current;
+
+    prevLinesRef.current = linesNow;
+    prevLevelRef.current = levelNow;
+    prevIsGameOverRef.current = isGameOverNow;
+    prevIsPausedRef.current = isPausedNow;
+
+    if (linesAdded > 0) {
+      playClear(linesAdded);
+    }
+    if (levelUp) {
+      playLevelUp();
+    }
+    if (justGameOver) {
+      stopMusic();
+      playGameOver();
+    }
+    if (justPaused) {
+      pauseMusic();
+    }
+    if (justResumed && !isGameOverNow) {
+      resumeMusic();
+    }
+  }, [
+    gameState.linesCleared,
+    gameState.level,
+    gameState.isGameOver,
+    gameState.isPaused,
+    playClear,
+    playLevelUp,
+    playGameOver,
+    stopMusic,
+    pauseMusic,
+    resumeMusic,
+  ]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
-        case 'ArrowLeft':
+        case 'ArrowLeft': {
           e.preventDefault();
+          if (
+            gameState.currentPiece && !gameState.isGameOver && !gameState.isPaused &&
+            isValidPosition(gameState.board, gameState.currentPiece, {
+              ...gameState.currentPosition, x: gameState.currentPosition.x - 1,
+            })
+          ) playMove();
           moveLeft();
           break;
-        case 'ArrowRight':
+        }
+        case 'ArrowRight': {
           e.preventDefault();
+          if (
+            gameState.currentPiece && !gameState.isGameOver && !gameState.isPaused &&
+            isValidPosition(gameState.board, gameState.currentPiece, {
+              ...gameState.currentPosition, x: gameState.currentPosition.x + 1,
+            })
+          ) playMove();
           moveRight();
           break;
+        }
         case 'ArrowDown':
           e.preventDefault();
           moveDown(false);
           break;
-        case 'ArrowUp':
+        case 'ArrowUp': {
           e.preventDefault();
+          if (gameState.currentPiece && !gameState.isGameOver && !gameState.isPaused) {
+            playRotate();
+          }
           rotate();
           break;
+        }
         case ' ':
           e.preventDefault();
+          if (gameState.currentPiece && !gameState.isGameOver && !gameState.isPaused) {
+            playDrop();
+          }
           moveDown(true);
           break;
         case 'p':
         case 'P':
           togglePause();
           break;
+        case 'm':
+        case 'M':
+          toggleMute(!gameState.isGameOver && !gameState.isPaused);
+          break;
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [moveLeft, moveRight, moveDown, rotate, togglePause]);
+  }, [
+    moveLeft, moveRight, moveDown, rotate, togglePause, toggleMute,
+    playMove, playRotate, playDrop,
+    gameState.currentPiece, gameState.isGameOver, gameState.isPaused,
+    gameState.board, gameState.currentPosition,
+  ]);
 
   const handleStartGame = useCallback(() => {
     setShowSubmitForm(false);
     setScoreSubmitted(false);
+    // Reset prev refs so events are detected correctly for the new game
+    prevLinesRef.current = 0;
+    prevLevelRef.current = 1;
+    prevIsGameOverRef.current = false;
+    prevIsPausedRef.current = false;
     resetGame();
-  }, [resetGame]);
+    startMusic();
+  }, [resetGame, startMusic]);
 
   const handleSubmitScore = useCallback(async (name: string) => {
     setSubmitting(true);
@@ -168,6 +273,14 @@ export default function TetrisGame() {
       <button className="tetris-back-btn" onClick={() => navigate('/')}>← Back to Dashboard</button>
       <header className="app-header">
         <h1 className="app-title">TETRIS</h1>
+        <button
+          className="tetris-mute-btn"
+          onClick={() => toggleMute(!gameState.isGameOver && !gameState.isPaused)}
+          title={isMuted ? 'Unmute (M)' : 'Mute (M)'}
+          aria-label={isMuted ? 'Unmute sound' : 'Mute sound'}
+        >
+          {isMuted ? '🔇' : '🔊'}
+        </button>
       </header>
       <main className="game-container">
         <aside className="sidebar sidebar-left">

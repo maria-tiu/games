@@ -56,6 +56,7 @@ const GameInfo: React.FC<GameInfoProps> = ({
         <p>↓ Soft Drop</p>
         <p>Space Hard Drop</p>
         <p>P Pause</p>
+        <p>M Mute</p>
       </div>
     </div>
   );

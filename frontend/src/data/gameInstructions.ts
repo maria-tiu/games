@@ -74,4 +74,19 @@ export const GAME_INSTRUCTIONS: Record<string, GameInstructionsData> = {
       'Watch the ball\'s trajectory before launching so you can plan your position.',
     ],
   },
+  mario: {
+    title: 'How to play Mario',
+    description:
+      'Run and jump across platforms to collect all 16 coins. Watch out for Goombas — jump on top of them to defeat them. Fall off the screen or get hit from the side and you lose a life. Collect all coins to win!',
+    controls: [
+      { key: '← → / A D', action: 'Move left / right' },
+      { key: '↑ / W / Space', action: 'Jump (only when on the ground)' },
+      { key: 'P', action: 'Pause / Resume' },
+    ],
+    tips: [
+      'Jump on top of Goombas to stomp them for 200 points each.',
+      'Coins are worth 100 points each — collect them all to win.',
+      'After getting hit you have brief invincibility (Mario flashes).',
+    ],
+  },
 };

@@ -20,6 +20,7 @@ const GAMES: Game[] = [
   { id: 'sliding-puzzle', name: 'Sliding Puzzle', players: 1, route: '/sliding-puzzle' },
   { id: '2048', name: '2048', players: 1, route: '/2048' },
   { id: 'breakout', name: 'Breakout', players: 1, route: '/breakout' },
+  { id: 'mario', name: 'Mario', players: 1, route: '/mario' },
 ];
 
 export default function Dashboard() {

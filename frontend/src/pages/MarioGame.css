@@ -1,0 +1,164 @@
+.mario-page {
+  min-height: 100vh;
+  background-color: #0a0a1a;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mario-top-bar {
+  position: fixed;
+  top: 12px;
+  left: 16px;
+  right: 16px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.mario-back-btn {
+  pointer-events: all;
+  background: transparent;
+  border: 1px solid #555;
+  color: #aaa;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.mario-back-btn:hover {
+  color: #ff6b35;
+  border-color: #ff6b35;
+}
+
+.mario-info-btn {
+  pointer-events: all;
+}
+
+.mario-header {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid #222;
+  width: 100%;
+}
+
+.mario-title {
+  font-size: 36px;
+  letter-spacing: 10px;
+  color: #ff6b35;
+  text-shadow: 0 0 20px rgba(255, 107, 53, 0.6);
+  font-weight: 900;
+}
+
+.mario-hud {
+  display: flex;
+  gap: 48px;
+  padding: 12px 0 8px;
+}
+
+.mario-hud-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.mario-hud-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.mario-hud-value {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ff6b35;
+  min-width: 80px;
+  text-align: center;
+}
+
+.mario-canvas-wrapper {
+  position: relative;
+  margin-top: 8px;
+}
+
+.mario-canvas {
+  display: block;
+  border: 2px solid #222;
+  border-radius: 4px;
+  max-width: 100%;
+}
+
+.mario-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.80);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border-radius: 4px;
+}
+
+.mario-overlay--gameover .mario-overlay-title {
+  color: #ff4757;
+}
+
+.mario-overlay--win .mario-overlay-title {
+  color: #2ed573;
+}
+
+.mario-overlay-title {
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  color: #fff;
+  text-shadow: 0 0 16px currentColor;
+}
+
+.mario-overlay-sub {
+  font-size: 15px;
+  color: #ccc;
+  letter-spacing: 1px;
+}
+
+.mario-overlay-sub kbd {
+  background: #333;
+  border: 1px solid #666;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 13px;
+  color: #ff6b35;
+}
+
+.mario-btn {
+  margin-top: 8px;
+  padding: 10px 28px;
+  background-color: #ff6b35;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: transform 0.1s, background-color 0.2s;
+}
+
+.mario-btn:hover {
+  background-color: #e55a24;
+}
+
+.mario-btn:active {
+  transform: scale(0.97);
+}

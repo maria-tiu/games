@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
+import { useUISound } from '../hooks/useUISound';
 import './GameInfoButton.css';
 
 interface Props {
@@ -22,7 +23,9 @@ export default function GameInfoButton({ gameId }: Props) {
   const [pos, setPos] = useState<TooltipPos | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isVisibleRef = useRef(false);
   const instructions = GAME_INSTRUCTIONS[gameId];
+  const { playInfo } = useUISound();
 
   const show = useCallback(() => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
@@ -35,15 +38,22 @@ export default function GameInfoButton({ gameId }: Props) {
     const spaceBelow = window.innerHeight - rect.bottom - GAP - PAD;
     const spaceAbove = rect.top - GAP - PAD;
 
+    if (!isVisibleRef.current) {
+      isVisibleRef.current = true;
+      playInfo();
+    }
     if (spaceBelow >= spaceAbove) {
       setPos({ top: rect.bottom + GAP, left, maxHeight: spaceBelow });
     } else {
       setPos({ bottom: window.innerHeight - rect.top + GAP, left, maxHeight: spaceAbove });
     }
-  }, []);
+  }, [playInfo]);
 
   const hide = useCallback(() => {
-    hideTimer.current = setTimeout(() => setPos(null), 80);
+    hideTimer.current = setTimeout(() => {
+      isVisibleRef.current = false;
+      setPos(null);
+    }, 80);
   }, []);
 
   const cancelHide = useCallback(() => {

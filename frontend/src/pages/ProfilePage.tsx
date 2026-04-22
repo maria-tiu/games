@@ -5,13 +5,14 @@ import { usePlaylist } from '../context/usePlaylist';
 import { fetchUserProfile, updateUserProfile } from '../api/profile';
 import { fetchMyScores } from '../api/scores';
 import type { UserProfile } from '../api/profile';
-import GameInstructionsModal from '../components/GameInstructionsModal';
+import GameInfoButton from '../components/GameInfoButton';
 import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
 import './ProfilePage.css';
 
 const GAME_ROUTES: Record<string, string> = {
   tetris: '/tetris',
   'sliding-puzzle': '/sliding-puzzle',
+  breakout: '/breakout',
 };
 
 function formatErrors(err: unknown): string {
@@ -41,7 +42,6 @@ export default function ProfilePage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const [removingId, setRemovingId] = useState<number | null>(null);
-  const [instructionsGameId, setInstructionsGameId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -248,16 +248,7 @@ export default function ProfilePage() {
                 <tr key={entry.id}>
                   <td className="game-name">
                     {entry.game_name}
-                    {entry.game_id in GAME_INSTRUCTIONS && (
-                      <button
-                        className="btn-info"
-                        onClick={() => setInstructionsGameId(entry.game_id)}
-                        title={`How to play ${entry.game_name}`}
-                        aria-label={`How to play ${entry.game_name}`}
-                      >
-                        ?
-                      </button>
-                    )}
+                    {entry.game_id in GAME_INSTRUCTIONS && <GameInfoButton gameId={entry.game_id} />}
                   </td>
                   <td className="game-score">
                     {myLastScores[entry.game_id] !== undefined
@@ -290,12 +281,6 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {instructionsGameId && (
-        <GameInstructionsModal
-          gameId={instructionsGameId}
-          onClose={() => setInstructionsGameId(null)}
-        />
-      )}
     </div>
   );
 }

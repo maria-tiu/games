@@ -163,14 +163,17 @@ export default function BreakoutGame() {
     const gs = stateRef.current;
     if (!gs.started || gs.gameOver || gs.won || gs.paused) return;
 
-    // Submit score via ref so we don't need auth values in the dependency array
+    // Submit score via ref so we don't need auth values in the dependency array.
+    // Submit without a token so the request is treated as anonymous by the backend —
+    // this avoids a 401 from a stale/expired token (DRF rejects invalid tokens even on
+    // AllowAny endpoints). The player_name is still stored and matched by UserScoreView
+    // via Q(player_name=request.user.username), so the score appears on the Profile page.
     const trySubmitScore = (score: number) => {
-      const { isLoggedIn: li, username: un, token: tk } = authRef.current;
-      if (score > 0 && li && un && tk && !scoreSubmittedRef.current) {
+      const { username: un } = authRef.current;
+      if (score > 0 && un && !scoreSubmittedRef.current) {
         scoreSubmittedRef.current = true;
         scorePromiseRef.current = submitScore(
           { game_id: 'breakout', player_name: un, score, lines_cleared: 0, level: 1 },
-          tk,
         ).then(() => undefined).catch(() => undefined);
       }
     };

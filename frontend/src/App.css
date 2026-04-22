@@ -150,3 +150,22 @@
   border-color: #00f0f0;
 }
 
+.tetris-mute-btn {
+  position: absolute;
+  right: 16px;
+  background: transparent;
+  border: 1px solid #555;
+  color: #aaa;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tetris-mute-btn:hover {
+  color: #00f0f0;
+  border-color: #00f0f0;
+}
+

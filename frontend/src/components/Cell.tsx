@@ -9,14 +9,22 @@ interface CellProps {
 
 const Cell: React.FC<CellProps> = ({ value, isGhost }) => {
   const style: React.CSSProperties = value !== 0
-    ? {
-        backgroundColor: isGhost ? 'transparent' : (value as string),
-        border: isGhost
-          ? `2px solid ${value as string}`
-          : '2px solid rgba(255,255,255,0.15)',
-        boxShadow: isGhost ? 'none' : `inset 0 0 6px rgba(255,255,255,0.3)`,
-        opacity: isGhost ? 0.4 : 1,
-      }
+    ? isGhost
+      ? {
+          border: `2px solid ${value as string}`,
+          opacity: 0.35,
+        }
+      : {
+          backgroundColor: value as string,
+          backgroundImage: `linear-gradient(145deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 40%, rgba(0,0,0,0.25) 100%)`,
+          boxShadow: `
+            inset 3px 3px 5px rgba(255,255,255,0.45),
+            inset -3px -3px 5px rgba(0,0,0,0.45),
+            2px 2px 4px rgba(0,0,0,0.5)
+          `,
+          border: `1px solid rgba(255,255,255,0.15)`,
+          borderRadius: '3px',
+        }
     : {};
   return <div className={`cell${value !== 0 ? ' filled' : ''}`} style={style} />;
 };

@@ -192,3 +192,22 @@ class UserScoreView(APIView):
         serializer = ScoreSerializer(scores, many=True)
         return Response(serializer.data)
 
+
+class UserScoreHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, game_id):
+        """Return the last 10 scores for the authenticated user for a specific game.
+
+        Results are ordered from most recent to oldest.
+        Matches scores by user FK (new records) OR by player_name (legacy records).
+        """
+        from django.db.models import Q
+        user_filter = Q(user=request.user) | Q(player_name=request.user.username)
+        scores = (
+            Score.objects.filter(user_filter, game_id=game_id)
+            .order_by('-created_at')[:10]
+        )
+        serializer = ScoreSerializer(scores, many=True)
+        return Response(serializer.data)
+

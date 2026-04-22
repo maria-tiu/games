@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { usePlaylist } from '../context/usePlaylist';
@@ -30,21 +30,23 @@ export default function Dashboard() {
   const { isInPlaylist, addGame } = usePlaylist();
   const navigate = useNavigate();
   const [addingGame, setAddingGame] = useState<string | null>(null);
-  const [bestScores, setBestScores] = useState<Record<string, ScoreEntry>>({});
+  const [allScores, setAllScores] = useState<Record<string, ScoreEntry[]>>({});
+  const [hoveredGame, setHoveredGame] = useState<string | null>(null);
   const { playClick, playHover } = useUISound();
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const map: Record<string, ScoreEntry> = {};
+    const map: Record<string, ScoreEntry[]> = {};
     const fetches = GAMES.map((game) =>
       fetchHighScores(game.id)
         .then((scores) => {
-          if (scores.length > 0) map[game.id] = scores[0];
+          map[game.id] = scores;
         })
         .catch(() => {
           // ignore — best score column will simply be empty for this game
         })
     );
-    Promise.all(fetches).then(() => setBestScores({ ...map }));
+    Promise.all(fetches).then(() => setAllScores({ ...map }));
   }, []);
 
   const handlePlay = (game: Game) => {
@@ -66,6 +68,18 @@ export default function Dashboard() {
     }
   };
 
+  const handleScoreMouseEnter = (gameId: string) => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    setHoveredGame(gameId);
+  };
+
+  const handleScoreMouseLeave = () => {
+    hideTimerRef.current = setTimeout(() => setHoveredGame(null), 150);
+  };
+
   return (
     <div className="dashboard">
       <h2 className="dashboard-title">Board of Games</h2>
@@ -83,7 +97,8 @@ export default function Dashboard() {
           <tbody>
             {GAMES.map((game) => {
               const inPlaylist = isInPlaylist(game.id);
-              const best = bestScores[game.id];
+              const scores = allScores[game.id] ?? [];
+              const best = scores[0];
               const hasInstructions = game.id in GAME_INSTRUCTIONS;
               return (
                 <tr key={game.id} onMouseEnter={playHover} className="dashboard-row">
@@ -118,7 +133,11 @@ export default function Dashboard() {
                       Play
                     </button>
                   </td>
-                  <td className="game-score">
+                  <td
+                    className="game-score score-cell"
+                    onMouseEnter={() => handleScoreMouseEnter(game.id)}
+                    onMouseLeave={handleScoreMouseLeave}
+                  >
                     {best ? (
                       <>
                         <span>{best.score}</span>
@@ -126,6 +145,24 @@ export default function Dashboard() {
                       </>
                     ) : (
                       <span className="game-score-none">—</span>
+                    )}
+                    {hoveredGame === game.id && scores.length > 0 && (
+                      <div
+                        className="score-popup"
+                        onMouseEnter={() => handleScoreMouseEnter(game.id)}
+                        onMouseLeave={handleScoreMouseLeave}
+                      >
+                        <div className="score-popup-title">Top 10 Scores</div>
+                        <ol className="score-popup-list">
+                          {scores.map((s, idx) => (
+                            <li key={s.id} className="score-popup-item">
+                              <span className="score-popup-rank">#{idx + 1}</span>
+                              <span className="score-popup-name">{s.player_name}</span>
+                              <span className="score-popup-value">{s.score}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
                     )}
                   </td>
                 </tr>

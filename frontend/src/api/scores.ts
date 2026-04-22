@@ -41,3 +41,13 @@ export async function fetchMyScores(token: string): Promise<ScoreEntry[]> {
   }
   return response.json();
 }
+
+export async function fetchMyScoreHistory(token: string, gameId: string): Promise<ScoreEntry[]> {
+  const response = await fetch(`${API_BASE}/auth/my-scores/${encodeURIComponent(gameId)}/`, {
+    headers: { Authorization: `Token ${token}` },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch score history');
+  }
+  return response.json();
+}

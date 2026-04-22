@@ -89,4 +89,20 @@ export const GAME_INSTRUCTIONS: Record<string, GameInstructionsData> = {
       'After getting hit you have brief invincibility (Mario flashes).',
     ],
   },
+  pacman: {
+    title: 'How to play Pac-Man',
+    description:
+      'Navigate the maze eating all dots to win. Power pellets turn ghosts blue — chase and eat them for bonus points! The game ends when all lives are lost.',
+    controls: [
+      { key: '← → ↑ ↓', action: 'Move Pac-Man' },
+      { key: 'W A S D',  action: 'Alternative move keys' },
+      { key: 'Space / Enter', action: 'Start / Resume after death' },
+      { key: 'P',        action: 'Pause / Resume' },
+    ],
+    tips: [
+      'Queue a turn early — the direction change is buffered until the next corridor.',
+      'Eating multiple ghosts in one power-pellet session doubles the points each time.',
+      'The tunnel on row 9 wraps around — use it to lose a chasing ghost!',
+    ],
+  },
 };

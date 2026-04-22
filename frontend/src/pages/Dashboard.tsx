@@ -4,7 +4,7 @@ import { useAuth } from '../context/useAuth';
 import { usePlaylist } from '../context/usePlaylist';
 import { fetchHighScores } from '../api/scores';
 import type { ScoreEntry } from '../types';
-import GameInstructionsModal from '../components/GameInstructionsModal';
+import GameInfoButton from '../components/GameInfoButton';
 import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
 import './Dashboard.css';
 
@@ -27,7 +27,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [addingGame, setAddingGame] = useState<string | null>(null);
   const [bestScores, setBestScores] = useState<Record<string, ScoreEntry>>({});
-  const [instructionsGameId, setInstructionsGameId] = useState<string | null>(null);
 
   useEffect(() => {
     const map: Record<string, ScoreEntry> = {};
@@ -83,16 +82,7 @@ export default function Dashboard() {
                 <tr key={game.id}>
                   <td className="game-name">
                     {game.name}
-                    {hasInstructions && (
-                      <button
-                        className="btn-info"
-                        onClick={() => setInstructionsGameId(game.id)}
-                        title={`How to play ${game.name}`}
-                        aria-label={`How to play ${game.name}`}
-                      >
-                        ?
-                      </button>
-                    )}
+                    {hasInstructions && <GameInfoButton gameId={game.id} />}
                   </td>
                   <td>{game.players}</td>
                   <td>
@@ -143,12 +133,6 @@ export default function Dashboard() {
         </p>
       )}
 
-      {instructionsGameId && (
-        <GameInstructionsModal
-          gameId={instructionsGameId}
-          onClose={() => setInstructionsGameId(null)}
-        />
-      )}
     </div>
   );
 }

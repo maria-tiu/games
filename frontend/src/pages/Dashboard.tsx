@@ -6,6 +6,7 @@ import { fetchHighScores } from '../api/scores';
 import type { ScoreEntry } from '../types';
 import GameInfoButton from '../components/GameInfoButton';
 import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
+import { useUISound } from '../hooks/useUISound';
 import './Dashboard.css';
 
 interface Game {
@@ -30,6 +31,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [addingGame, setAddingGame] = useState<string | null>(null);
   const [bestScores, setBestScores] = useState<Record<string, ScoreEntry>>({});
+  const { playClick, playHover } = useUISound();
 
   useEffect(() => {
     const map: Record<string, ScoreEntry> = {};
@@ -47,11 +49,13 @@ export default function Dashboard() {
 
   const handlePlay = (game: Game) => {
     if (!isLoggedIn) return;
+    playClick();
     navigate(game.route);
   };
 
   const handleAddToPlaylist = async (game: Game) => {
     if (!isLoggedIn || addingGame) return;
+    playClick();
     setAddingGame(game.id);
     try {
       await addGame(game.id, game.name);
@@ -82,7 +86,7 @@ export default function Dashboard() {
               const best = bestScores[game.id];
               const hasInstructions = game.id in GAME_INSTRUCTIONS;
               return (
-                <tr key={game.id}>
+                <tr key={game.id} onMouseEnter={playHover} className="dashboard-row">
                   <td className="game-name">
                     {game.name}
                     {hasInstructions && <GameInfoButton gameId={game.id} />}

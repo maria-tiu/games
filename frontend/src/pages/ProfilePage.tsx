@@ -7,6 +7,7 @@ import { fetchMyScores } from '../api/scores';
 import type { UserProfile } from '../api/profile';
 import GameInfoButton from '../components/GameInfoButton';
 import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
+import { useUISound } from '../hooks/useUISound';
 import './ProfilePage.css';
 
 const GAME_ROUTES: Record<string, string> = {
@@ -28,6 +29,7 @@ export default function ProfilePage() {
   const { isLoggedIn, username, token, updateUsername } = useAuth();
   const { playlist, removeGame } = usePlaylist();
   const navigate = useNavigate();
+  const { playClick, playRemove, playHover } = useUISound();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -76,6 +78,7 @@ export default function ProfilePage() {
 
   const handleSaveUsername = async () => {
     if (!token || !profile) return;
+    playClick();
     setError(null);
     setSuccessMsg(null);
     setSaving(true);
@@ -95,6 +98,7 @@ export default function ProfilePage() {
 
   const handleSaveEmail = async () => {
     if (!token || !profile) return;
+    playClick();
     setError(null);
     setSuccessMsg(null);
     setSaving(true);
@@ -112,6 +116,7 @@ export default function ProfilePage() {
   };
 
   const handleRemoveGame = async (id: number) => {
+    playRemove();
     setRemovingId(id);
     try {
       await removeGame(id);
@@ -123,6 +128,7 @@ export default function ProfilePage() {
   };
 
   const handlePlay = (gameId: string) => {
+    playClick();
     const route = GAME_ROUTES[gameId];
     if (route) navigate(route);
   };
@@ -161,6 +167,7 @@ export default function ProfilePage() {
                 <button
                   className="btn-profile btn-cancel"
                   onClick={() => {
+                    playClick();
                     setEditingUsername(false);
                     setNewUsername(profile?.username ?? username ?? '');
                   }}
@@ -174,7 +181,7 @@ export default function ProfilePage() {
                 <span>{profile?.username ?? username}</span>
                 <button
                   className="btn-profile btn-edit"
-                  onClick={() => setEditingUsername(true)}
+                  onClick={() => { playClick(); setEditingUsername(true); }}
                 >
                   Edit
                 </button>
@@ -203,6 +210,7 @@ export default function ProfilePage() {
                 <button
                   className="btn-profile btn-cancel"
                   onClick={() => {
+                    playClick();
                     setEditingEmail(false);
                     setNewEmail(profile?.email ?? '');
                   }}
@@ -216,7 +224,7 @@ export default function ProfilePage() {
                 <span>{profile?.email ?? '—'}</span>
                 <button
                   className="btn-profile btn-edit"
-                  onClick={() => setEditingEmail(true)}
+                  onClick={() => { playClick(); setEditingEmail(true); }}
                 >
                   Edit
                 </button>
@@ -246,7 +254,7 @@ export default function ProfilePage() {
             </thead>
             <tbody>
               {playlist.map((entry) => (
-                <tr key={entry.id}>
+                <tr key={entry.id} onMouseEnter={playHover} className="profile-row">
                   <td className="game-name">
                     {entry.game_name}
                     {entry.game_id in GAME_INSTRUCTIONS && <GameInfoButton gameId={entry.game_id} />}

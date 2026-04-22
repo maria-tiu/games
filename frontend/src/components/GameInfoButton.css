@@ -3,8 +3,8 @@
   border: 1px solid #00f0f0;
   border-radius: 10px;
   padding: 16px 18px 18px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 240, 240, 0.15);
-  animation: git-fade-in 0.12s ease;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 240, 240, 0.2);
+  animation: git-fade-in 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-family: inherit;
   font-size: 13px;
   line-height: 1.4;
@@ -12,8 +12,8 @@
 }
 
 @keyframes git-fade-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .git-title {

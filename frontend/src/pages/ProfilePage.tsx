@@ -48,6 +48,7 @@ export default function ProfilePage() {
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [scoreHistory, setScoreHistory] = useState<Record<string, ScoreEntry[]>>({});
   const [hoveredGameId, setHoveredGameId] = useState<string | null>(null);
+  const [popupPos, setPopupPos] = useState<{ bottom: number; right: number } | null>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -137,16 +138,28 @@ export default function ProfilePage() {
     if (route) navigate(route);
   };
 
-  const handleScoreMouseEnter = (gameId: string) => {
+  const handleScoreMouseEnter = (gameId: string, e: React.MouseEvent<HTMLTableCellElement>) => {
     if (hideTimerRef.current) {
       clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
     }
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPopupPos({
+      bottom: window.innerHeight - rect.top + 6,
+      right: window.innerWidth - rect.right,
+    });
     setHoveredGameId(gameId);
     if (!scoreHistory[gameId] && token) {
       fetchMyScoreHistory(token, gameId)
         .then((history) => setScoreHistory((prev) => ({ ...prev, [gameId]: history })))
         .catch(() => {});
+    }
+  };
+
+  const handlePopupMouseEnter = () => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
     }
   };
 
@@ -282,16 +295,17 @@ export default function ProfilePage() {
                   </td>
                   <td
                     className="game-score score-cell"
-                    onMouseEnter={() => handleScoreMouseEnter(entry.game_id)}
+                    onMouseEnter={(e) => handleScoreMouseEnter(entry.game_id, e)}
                     onMouseLeave={handleScoreMouseLeave}
                   >
                     {myLastScores[entry.game_id] !== undefined
                       ? myLastScores[entry.game_id]
                       : '—'}
-                    {hoveredGameId === entry.game_id && (scoreHistory[entry.game_id] ?? []).length > 0 && (
+                    {hoveredGameId === entry.game_id && (scoreHistory[entry.game_id] ?? []).length > 0 && popupPos && (
                       <div
                         className="score-popup"
-                        onMouseEnter={() => handleScoreMouseEnter(entry.game_id)}
+                        style={{ bottom: `${popupPos.bottom}px`, right: `${popupPos.right}px` }}
+                        onMouseEnter={handlePopupMouseEnter}
                         onMouseLeave={handleScoreMouseLeave}
                       >
                         <div className="score-popup-title">Last 10 Tries</div>

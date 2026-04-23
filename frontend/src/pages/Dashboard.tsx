@@ -32,6 +32,7 @@ export default function Dashboard() {
   const [addingGame, setAddingGame] = useState<string | null>(null);
   const [allScores, setAllScores] = useState<Record<string, ScoreEntry[]>>({});
   const [hoveredGame, setHoveredGame] = useState<string | null>(null);
+  const [popupPos, setPopupPos] = useState<{ bottom: number; right: number } | null>(null);
   const { playClick, playHover } = useUISound();
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -68,12 +69,24 @@ export default function Dashboard() {
     }
   };
 
-  const handleScoreMouseEnter = (gameId: string) => {
+  const handleScoreMouseEnter = (gameId: string, e: React.MouseEvent<HTMLTableCellElement>) => {
     if (hideTimerRef.current) {
       clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
     }
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPopupPos({
+      bottom: window.innerHeight - rect.top + 6,
+      right: window.innerWidth - rect.right,
+    });
     setHoveredGame(gameId);
+  };
+
+  const handlePopupMouseEnter = () => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
   };
 
   const handleScoreMouseLeave = () => {
@@ -135,7 +148,7 @@ export default function Dashboard() {
                   </td>
                   <td
                     className="game-score score-cell"
-                    onMouseEnter={() => handleScoreMouseEnter(game.id)}
+                    onMouseEnter={(e) => handleScoreMouseEnter(game.id, e)}
                     onMouseLeave={handleScoreMouseLeave}
                   >
                     {best ? (
@@ -146,10 +159,11 @@ export default function Dashboard() {
                     ) : (
                       <span className="game-score-none">—</span>
                     )}
-                    {hoveredGame === game.id && scores.length > 0 && (
+                    {hoveredGame === game.id && scores.length > 0 && popupPos && (
                       <div
                         className="score-popup"
-                        onMouseEnter={() => handleScoreMouseEnter(game.id)}
+                        style={{ bottom: `${popupPos.bottom}px`, right: `${popupPos.right}px` }}
+                        onMouseEnter={handlePopupMouseEnter}
                         onMouseLeave={handleScoreMouseLeave}
                       >
                         <div className="score-popup-title">Top 10 Scores</div>

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { usePlaylist } from '../context/usePlaylist';
 import { fetchUserProfile, updateUserProfile } from '../api/profile';
-import { fetchMyScores } from '../api/scores';
+import { fetchMyScores, fetchMyScoreHistory } from '../api/scores';
 import type { UserProfile } from '../api/profile';
+import type { ScoreEntry } from '../types';
 import GameInfoButton from '../components/GameInfoButton';
 import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
 import { useUISound } from '../hooks/useUISound';
@@ -45,6 +46,10 @@ export default function ProfilePage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const [scoreHistory, setScoreHistory] = useState<Record<string, ScoreEntry[]>>({});
+  const [hoveredGameId, setHoveredGameId] = useState<string | null>(null);
+  const [popupPos, setPopupPos] = useState<{ bottom: number; right: number } | null>(null);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -131,6 +136,35 @@ export default function ProfilePage() {
     playClick();
     const route = GAME_ROUTES[gameId];
     if (route) navigate(route);
+  };
+
+  const handleScoreMouseEnter = (gameId: string, e: React.MouseEvent<HTMLTableCellElement>) => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPopupPos({
+      bottom: window.innerHeight - rect.top + 6,
+      right: window.innerWidth - rect.right,
+    });
+    setHoveredGameId(gameId);
+    if (!scoreHistory[gameId] && token) {
+      fetchMyScoreHistory(token, gameId)
+        .then((history) => setScoreHistory((prev) => ({ ...prev, [gameId]: history })))
+        .catch(() => {});
+    }
+  };
+
+  const handlePopupMouseEnter = () => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  };
+
+  const handleScoreMouseLeave = () => {
+    hideTimerRef.current = setTimeout(() => setHoveredGameId(null), 150);
   };
 
   if (!isLoggedIn) return null;
@@ -259,10 +293,35 @@ export default function ProfilePage() {
                     {entry.game_name}
                     {entry.game_id in GAME_INSTRUCTIONS && <GameInfoButton gameId={entry.game_id} />}
                   </td>
-                  <td className="game-score">
+                  <td
+                    className="game-score score-cell"
+                    onMouseEnter={(e) => handleScoreMouseEnter(entry.game_id, e)}
+                    onMouseLeave={handleScoreMouseLeave}
+                  >
                     {myLastScores[entry.game_id] !== undefined
                       ? myLastScores[entry.game_id]
                       : '—'}
+                    {hoveredGameId === entry.game_id && (scoreHistory[entry.game_id] ?? []).length > 0 && popupPos && (
+                      <div
+                        className="score-popup"
+                        style={{ bottom: `${popupPos.bottom}px`, right: `${popupPos.right}px` }}
+                        onMouseEnter={handlePopupMouseEnter}
+                        onMouseLeave={handleScoreMouseLeave}
+                      >
+                        <div className="score-popup-title">Last 10 Tries</div>
+                        <ol className="score-popup-list">
+                          {(scoreHistory[entry.game_id] ?? []).map((s, idx) => (
+                            <li key={s.id} className="score-popup-item">
+                              <span className="score-popup-rank">#{idx + 1}</span>
+                              <span className="score-popup-value">{s.score}</span>
+                              <span className="score-popup-date">
+                                {new Date(s.created_at).toLocaleDateString()}
+                              </span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
                   </td>
                   <td>
                     <button

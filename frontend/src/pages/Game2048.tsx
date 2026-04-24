@@ -145,6 +145,7 @@ export default function Game2048() {
     setScoreSubmitted(false);
     wonPlayedRef.current = false;
     gameOverPlayedRef.current = false;
+    prevScoreRef.current = 0;
     reset();
   }, [reset]);
 

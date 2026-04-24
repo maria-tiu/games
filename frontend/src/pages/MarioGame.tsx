@@ -17,6 +17,7 @@ const JUMP_FORCE = -13;
 const MOVE_SPD = 4;
 const ENEMY_SPD = 1.5;
 const LIVES_INIT = 3;
+const COIN_RADIUS = 10;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Platform { x: number; y: number; w: number; h: number }
@@ -186,7 +187,7 @@ export default function MarioGame() {
       ctx.shadowBlur = 12;
       ctx.fillStyle = '#FFD700';
       ctx.beginPath();
-      ctx.arc(c.x, c.y, 10, 0, Math.PI * 2);
+      ctx.arc(c.x, c.y, COIN_RADIUS, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#FFA500';
       ctx.lineWidth = 2;
@@ -194,7 +195,7 @@ export default function MarioGame() {
       // Shine highlight
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
       ctx.beginPath();
-      ctx.arc(c.x - 3, c.y - 3, 3, 0, Math.PI * 2);
+      ctx.arc(c.x - 3, c.y - 3, COIN_RADIUS * 0.3, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
       ctx.shadowColor = 'transparent';

@@ -160,16 +160,12 @@ interface MarioSound extends BaseSound {
   playWin: () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface DashboardSound extends BaseSound {
-  // no SFX
-}
 // Overloads
 export function useGameSound(theme: 'sliding-puzzle'): SlidingPuzzleSound;
 export function useGameSound(theme: '2048'): Game2048Sound;
 export function useGameSound(theme: 'breakout'): BreakoutSound;
 export function useGameSound(theme: 'mario'): MarioSound;
-export function useGameSound(theme: 'dashboard'): DashboardSound;
+export function useGameSound(theme: 'dashboard'): BaseSound;
 export function useGameSound(theme: GameSoundTheme): BaseSound;
 
 export function useGameSound(theme: GameSoundTheme): BaseSound {

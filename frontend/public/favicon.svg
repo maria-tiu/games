@@ -10,9 +10,10 @@
   <rect x="11" y="22" width="10" height="4" rx="1" fill="#111127"/>
   <!-- D-pad vertical -->
   <rect x="14" y="19" width="4" height="10" rx="1" fill="#111127"/>
-  <!-- Action buttons -->
+  <!-- Action buttons (diamond layout) -->
+  <circle cx="35" cy="16" r="2.5" fill="#ffd93d"/>
   <circle cx="32" cy="21" r="2.5" fill="#ff6b6b"/>
-  <circle cx="38" cy="21" r="2.5" fill="#ffd93d"/>
+  <circle cx="38" cy="21" r="2.5" fill="#4f9eff"/>
   <circle cx="35" cy="26" r="2.5" fill="#6bcb77"/>
   <!-- Center select/start buttons -->
   <rect x="20" y="23" width="3.5" height="2.5" rx="1" fill="#111127"/>

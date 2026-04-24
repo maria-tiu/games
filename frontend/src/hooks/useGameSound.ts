@@ -164,7 +164,6 @@ interface MarioSound extends BaseSound {
 interface DashboardSound extends BaseSound {
   // no SFX
 }
-
 // Overloads
 export function useGameSound(theme: 'sliding-puzzle'): SlidingPuzzleSound;
 export function useGameSound(theme: '2048'): Game2048Sound;
@@ -201,7 +200,7 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
     return audioCtxRef.current;
   }, [theme]);
 
-  const scheduleNextNote = useCallback(function tick() {
+  const scheduleNextNote = useCallback(function scheduleNextNote() {
     if (!isMusicActiveRef.current || isMutedRef.current) return;
     const ctx = audioCtxRef.current;
     const master = masterGainRef.current;
@@ -224,7 +223,7 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
       osc.stop(ctx.currentTime + duration);
     }
 
-    musicTimerRef.current = setTimeout(tick, duration * 1000);
+    musicTimerRef.current = setTimeout(scheduleNextNote, duration * 1000);
   }, [theme]);
 
   const startMusic = useCallback(() => {

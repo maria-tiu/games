@@ -7,6 +7,7 @@ import type { ScoreEntry } from '../types';
 import GameInfoButton from '../components/GameInfoButton';
 import { GAME_INSTRUCTIONS } from '../data/gameInstructions';
 import { useUISound } from '../hooks/useUISound';
+import { useGameSound } from '../hooks/useGameSound';
 import './Dashboard.css';
 
 interface Game {
@@ -35,6 +36,26 @@ export default function Dashboard() {
   const [popupPos, setPopupPos] = useState<{ bottom: number; right: number } | null>(null);
   const { playClick, playHover } = useUISound();
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { isMuted: soundIsMuted, startMusic, stopMusic, toggleMute } = useGameSound('dashboard');
+  const musicStartedRef = useRef(false);
+
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      if (!musicStartedRef.current) {
+        musicStartedRef.current = true;
+        startMusic();
+        document.removeEventListener('click', handleFirstInteraction);
+        document.removeEventListener('keydown', handleFirstInteraction);
+      }
+    };
+    document.addEventListener('click', handleFirstInteraction);
+    document.addEventListener('keydown', handleFirstInteraction);
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('keydown', handleFirstInteraction);
+      stopMusic();
+    };
+  }, [startMusic, stopMusic]);
 
   useEffect(() => {
     const map: Record<string, ScoreEntry[]> = {};
@@ -95,7 +116,17 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-      <h2 className="dashboard-title">Board of Games</h2>
+      <div className="dashboard-title-row">
+        <h2 className="dashboard-title">Board of Games</h2>
+        <button
+          className="sound-toggle-btn dashboard-sound-btn"
+          onClick={() => toggleMute()}
+          title={soundIsMuted ? 'Unmute' : 'Mute'}
+          aria-label={soundIsMuted ? 'Unmute sound' : 'Mute sound'}
+        >
+          {soundIsMuted ? '🔇' : '🔊'}
+        </button>
+      </div>
       <div className="dashboard-table-wrapper">
         <table className="dashboard-table">
           <thead>

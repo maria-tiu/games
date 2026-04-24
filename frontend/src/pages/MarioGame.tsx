@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { submitScore } from '../api/scores';
 import GameInstructionsModal from '../components/GameInstructionsModal';
+import { useGameSound } from '../hooks/useGameSound';
 import './MarioGame.css';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -116,6 +117,12 @@ export default function MarioGame() {
   const authRef = useRef({ isLoggedIn, username, token });
   useEffect(() => { authRef.current = { isLoggedIn, username, token }; }, [isLoggedIn, username, token]);
 
+  const { isMuted: soundIsMuted, startMusic, stopMusic, playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin, toggleMute } = useGameSound('mario');
+  const soundRef = useRef({ playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin, startMusic, stopMusic });
+  useEffect(() => {
+    soundRef.current = { playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin, startMusic, stopMusic };
+  });
+
   const [showInstructions, setShowInstructions] = useState(false);
   const [displayState, setDisplayState] = useState({
     score: 0,
@@ -175,13 +182,22 @@ export default function MarioGame() {
     // Coins
     gs.coins.forEach((c) => {
       if (c.collected) return;
+      ctx.shadowColor = '#FFD700';
+      ctx.shadowBlur = 12;
       ctx.fillStyle = '#FFD700';
       ctx.beginPath();
-      ctx.arc(c.x, c.y, 8, 0, Math.PI * 2);
+      ctx.arc(c.x, c.y, 10, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = '#FFA500';
       ctx.lineWidth = 2;
       ctx.stroke();
+      // Shine highlight
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.beginPath();
+      ctx.arc(c.x - 3, c.y - 3, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = 'transparent';
       ctx.lineWidth = 1;
     });
 
@@ -280,6 +296,7 @@ export default function MarioGame() {
     if (keysRef.current.jump && gs.onGround) {
       gs.mvy = JUMP_FORCE;
       gs.onGround = false;
+      soundRef.current.playJump();
     }
 
     // Gravity
@@ -323,6 +340,8 @@ export default function MarioGame() {
       if (gs.lives <= 0) {
         gs.gameOver = true;
         trySubmitScore(gs.score);
+        soundRef.current.playGameOver();
+        soundRef.current.stopMusic();
         setDisplayState((d) => ({ ...d, lives: 0, gameOver: true }));
       } else {
         gs.mx = 50;
@@ -347,6 +366,7 @@ export default function MarioGame() {
         c.collected = true;
         gs.score += 100;
         coinCollected = true;
+        soundRef.current.playCoinCollect();
       }
     }
 
@@ -355,6 +375,8 @@ export default function MarioGame() {
       if (coinsLeft === 0) {
         gs.won = true;
         trySubmitScore(gs.score);
+        soundRef.current.playWin();
+        soundRef.current.stopMusic();
         setDisplayState((d) => ({ ...d, score: gs.score, won: true, coinsLeft: 0 }));
         return;
       }
@@ -390,6 +412,7 @@ export default function MarioGame() {
           e.alive = false;
           gs.mvy = -9;
           gs.score += 200;
+          soundRef.current.playStomp();
           setDisplayState((d) => ({ ...d, score: gs.score }));
         } else if (gs.invincible === 0) {
           // Side/bottom collision → lose life
@@ -397,6 +420,8 @@ export default function MarioGame() {
           if (gs.lives <= 0) {
             gs.gameOver = true;
             trySubmitScore(gs.score);
+            soundRef.current.playGameOver();
+            soundRef.current.stopMusic();
             setDisplayState((d) => ({ ...d, lives: 0, gameOver: true }));
           } else {
             gs.mx = 50;
@@ -447,6 +472,7 @@ export default function MarioGame() {
         keysRef.current.jump = true;
         if (!gs.started && !gs.gameOver && !gs.won) {
           gs.started = true;
+          soundRef.current.startMusic();
           setDisplayState((d) => ({ ...d, started: true }));
         }
       }
@@ -470,6 +496,7 @@ export default function MarioGame() {
 
   // ── Restart ───────────────────────────────────────────────────────────────────
   const handleRestart = useCallback(() => {
+    stopMusic();
     stateRef.current = initState();
     scoreSubmittedRef.current = false;
     scorePromiseRef.current = Promise.resolve();
@@ -482,7 +509,7 @@ export default function MarioGame() {
       paused: false,
       coinsLeft: INITIAL_COINS_COUNT,
     });
-  }, []);
+  }, [stopMusic]);
 
   // ── Back navigation ───────────────────────────────────────────────────────────
   const handleBack = useCallback(async () => {
@@ -495,6 +522,7 @@ export default function MarioGame() {
     const gs = stateRef.current;
     if (!gs.started && !gs.gameOver && !gs.won) {
       gs.started = true;
+      soundRef.current.startMusic();
       setDisplayState((d) => ({ ...d, started: true }));
     }
   }, []);
@@ -503,6 +531,14 @@ export default function MarioGame() {
     <div className="mario-page">
       <div className="mario-top-bar">
         <button className="mario-back-btn" onClick={() => void handleBack()}>← Back to Dashboard</button>
+        <button
+          className="sound-toggle-btn"
+          onClick={() => toggleMute(displayState.started && !displayState.gameOver && !displayState.won && !displayState.paused)}
+          title={soundIsMuted ? 'Unmute' : 'Mute'}
+          aria-label={soundIsMuted ? 'Unmute sound' : 'Mute sound'}
+        >
+          {soundIsMuted ? '🔇' : '🔊'}
+        </button>
         <button
           className="btn-info mario-info-btn"
           onClick={() => setShowInstructions(true)}

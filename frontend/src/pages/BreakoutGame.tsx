@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { submitScore } from '../api/scores';
 import GameInstructionsModal from '../components/GameInstructionsModal';
+import { useGameSound } from '../hooks/useGameSound';
 import './BreakoutGame.css';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -106,6 +107,12 @@ export default function BreakoutGame() {
   useEffect(() => {
     authRef.current = { isLoggedIn, username, token };
   }, [isLoggedIn, username, token]);
+
+  const { isMuted: soundIsMuted, startMusic, stopMusic, playPaddleHit, playBrickBreak, playLifeLost, playWin: playSoundWin, playGameOver, toggleMute } = useGameSound('breakout');
+  const soundRef = useRef({ playPaddleHit, playBrickBreak, playLifeLost, playWin: playSoundWin, playGameOver, startMusic, stopMusic });
+  useEffect(() => {
+    soundRef.current = { playPaddleHit, playBrickBreak, playLifeLost, playWin: playSoundWin, playGameOver, startMusic, stopMusic };
+  });
 
   const [showInstructions, setShowInstructions] = useState(false);
   const [displayState, setDisplayState] = useState({
@@ -212,6 +219,7 @@ export default function BreakoutGame() {
       const speed = Math.sqrt(gs.ballVx ** 2 + gs.ballVy ** 2);
       gs.ballVx = speed * Math.sin(angle);
       gs.ballVy = -Math.abs(speed * Math.cos(angle));
+      soundRef.current.playPaddleHit();
     }
 
     // Ball fell below paddle
@@ -220,6 +228,8 @@ export default function BreakoutGame() {
       if (gs.lives <= 0) {
         gs.gameOver = true;
         trySubmitScore(gs.score);
+        soundRef.current.playGameOver();
+        soundRef.current.stopMusic();
       } else {
         // Reset ball on paddle
         gs.ballX = gs.paddleX + PADDLE_WIDTH / 2;
@@ -227,6 +237,7 @@ export default function BreakoutGame() {
         gs.ballVx = BALL_SPEED_INITIAL * (Math.random() > 0.5 ? 1 : -1); // randomise left/right after losing a life
         gs.ballVy = -BALL_SPEED_INITIAL;
         gs.started = false; // wait for spacebar
+        soundRef.current.playLifeLost();
       }
       setDisplayState((d) => ({ ...d, lives: gs.lives, gameOver: gs.gameOver, started: gs.started }));
     }
@@ -245,6 +256,7 @@ export default function BreakoutGame() {
       ) {
         brick.alive = false;
         gs.score += BRICK_POINTS[brick.row % BRICK_POINTS.length];
+        soundRef.current.playBrickBreak();
 
         // Determine which side was hit
         const overlapLeft = gs.ballX + BALL_RADIUS - brick.x;
@@ -268,6 +280,8 @@ export default function BreakoutGame() {
     if (gs.bricks.every((b) => !b.alive)) {
       gs.won = true;
       trySubmitScore(gs.score);
+      soundRef.current.playWin();
+      soundRef.current.stopMusic();
       setDisplayState((d) => ({ ...d, won: true }));
     }
   }, []);
@@ -298,6 +312,7 @@ export default function BreakoutGame() {
         e.preventDefault();
         if (!gs.started && !gs.gameOver && !gs.won) {
           gs.started = true;
+          soundRef.current.startMusic();
           setDisplayState((d) => ({ ...d, started: true }));
         }
       }
@@ -332,17 +347,19 @@ export default function BreakoutGame() {
     const gs = stateRef.current;
     if (!gs.started && !gs.gameOver && !gs.won) {
       gs.started = true;
+      soundRef.current.startMusic();
       setDisplayState((d) => ({ ...d, started: true }));
     }
   }, []);
 
   // ── Reset ───────────────────────────────────────────────────────────────────
   const handleRestart = useCallback(() => {
+    stopMusic();
     stateRef.current = initialState();
     scoreSubmittedRef.current = false;
     scorePromiseRef.current = Promise.resolve();
     setDisplayState({ score: 0, lives: LIVES_INITIAL, started: false, gameOver: false, won: false, paused: false });
-  }, []);
+  }, [stopMusic]);
 
   // ── Back navigation ─────────────────────────────────────────────────────────
   // Await any pending score submission so the Dashboard re-fetches after it completes.
@@ -355,6 +372,14 @@ export default function BreakoutGame() {
     <div className="breakout-page">
       <div className="breakout-top-bar">
         <button className="breakout-back-btn" onClick={() => void handleBack()}>← Back to Dashboard</button>
+        <button
+          className="sound-toggle-btn"
+          onClick={() => toggleMute(displayState.started && !displayState.gameOver && !displayState.won && !displayState.paused)}
+          title={soundIsMuted ? 'Unmute' : 'Mute'}
+          aria-label={soundIsMuted ? 'Unmute sound' : 'Mute sound'}
+        >
+          {soundIsMuted ? '🔇' : '🔊'}
+        </button>
         <button
           className="btn-info breakout-info-btn"
           onClick={() => setShowInstructions(true)}

@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { submitScore } from '../api/scores';
+import { useGameSound } from '../hooks/useGameSound';
 import './SlidingPuzzle.css';
 
 type Board = number[];
@@ -62,9 +63,12 @@ export default function SlidingPuzzle() {
   const [won, setWon] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [running, setRunning] = useState(true);
+  const { isMuted, startMusic, stopMusic, playTileSlide, playWin: playSoundWin, toggleMute } = useGameSound('sliding-puzzle');
+  const hasStartedRef = useRef(false);
 
   const startNewGame = useCallback((newSize?: number) => {
     const s = newSize ?? size;
+    if (!hasStartedRef.current) { hasStartedRef.current = true; startMusic(); }
     setBoard(shuffle(createSolvedBoard(s), s));
     setMoves(0);
     setWon(false);
@@ -101,8 +105,10 @@ export default function SlidingPuzzle() {
 
   const handleTileClick = (idx: number) => {
     if (won) return;
+    if (!hasStartedRef.current) { hasStartedRef.current = true; startMusic(); }
     const blankIdx = board.indexOf(0);
     if (!canMove(idx, blankIdx, size)) return;
+    playTileSlide();
     const newBoard = [...board];
     [newBoard[blankIdx], newBoard[idx]] = [newBoard[idx], newBoard[blankIdx]];
     const newMoves = moves + 1;
@@ -112,6 +118,7 @@ export default function SlidingPuzzle() {
       setWon(true);
       setRunning(false);
       submitPuzzleScore(newMoves);
+      playSoundWin();
     }
   };
 
@@ -158,6 +165,10 @@ export default function SlidingPuzzle() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
+  useEffect(() => {
+    return () => { stopMusic(); };
+  }, [stopMusic]);
+
   const tileSize = TILE_SIZE[size] ?? 64;
   const solved = createSolvedBoard(size);
 
@@ -173,6 +184,14 @@ export default function SlidingPuzzle() {
 
       <header className="sliding-puzzle-header">
         <h1 className="sliding-puzzle-title">SLIDING PUZZLE</h1>
+        <button
+          className="sound-toggle-btn sliding-puzzle-sound-btn"
+          onClick={() => toggleMute(!won && running)}
+          title={isMuted ? 'Unmute' : 'Mute'}
+          aria-label={isMuted ? 'Unmute sound' : 'Mute sound'}
+        >
+          {isMuted ? '🔇' : '🔊'}
+        </button>
       </header>
 
       <main className="sliding-puzzle-main">

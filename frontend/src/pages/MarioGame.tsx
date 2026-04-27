@@ -20,6 +20,13 @@ const LIVES_INIT = 3;
 const TOTAL_LEVELS = 3;
 const RESPAWN_X = 50;
 const RESPAWN_Y = 414;
+const LEVEL_2_SPEED_MULT = 1.4;
+const LEVEL_3_SPEED_MULT = 1.6;
+
+const LEVEL_3_STARS: [number, number][] = [
+  [50, 30], [120, 60], [200, 25], [350, 45], [480, 20], [580, 55],
+  [700, 35], [750, 70], [90, 100], [300, 85], [550, 95], [650, 30],
+];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Platform { x: number; y: number; w: number; h: number }
@@ -152,7 +159,7 @@ function makeCoins(level: number): Coin[] {
 }
 
 function makeEnemies(level: number): Enemy[] {
-  const spd = level === 1 ? ENEMY_SPD : level === 2 ? ENEMY_SPD * 1.4 : ENEMY_SPD * 1.6;
+  const spd = level === 1 ? ENEMY_SPD : level === 2 ? ENEMY_SPD * LEVEL_2_SPEED_MULT : ENEMY_SPD * LEVEL_3_SPEED_MULT;
   if (level === 1) return [
     { x: 300, y: 414, w: 28, h: 28, vx: spd, alive: true, patrolLeft: 190, patrolRight: 440 },
     { x: 90,  y: 306, w: 28, h: 28, vx: spd, alive: true, patrolLeft: 80,  patrolRight: 210 },
@@ -288,8 +295,7 @@ export default function MarioGame() {
     } else {
       // Stars for level 3 night sky
       ctx.fillStyle = 'rgba(255,255,255,0.8)';
-      const stars: [number, number][] = [[50,30],[120,60],[200,25],[350,45],[480,20],[580,55],[700,35],[750,70],[90,100],[300,85],[550,95],[650,30]];
-      for (const [sx, sy] of stars) {
+      for (const [sx, sy] of LEVEL_3_STARS) {
         ctx.fillRect(sx, sy, 2, 2);
       }
       // Castle towers in background

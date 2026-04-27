@@ -121,8 +121,8 @@ export default function Dashboard() {
         <button
           className="sound-toggle-btn dashboard-sound-btn"
           onClick={() => toggleMute()}
-          title={soundIsMuted ? 'Unmute' : 'Mute'}
-          aria-label={soundIsMuted ? 'Unmute sound' : 'Mute sound'}
+          title={soundIsMuted ? 'Unmute music' : 'Mute music'}
+          aria-label={soundIsMuted ? 'Unmute music' : 'Mute music'}
         >
           {soundIsMuted ? '🔇' : '🔊'}
         </button>

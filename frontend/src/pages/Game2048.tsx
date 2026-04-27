@@ -176,8 +176,8 @@ export default function Game2048() {
         <button
           className="sound-toggle-btn"
           onClick={() => toggleMute(!state.gameOver && !state.won)}
-          title={isMuted ? 'Unmute' : 'Mute'}
-          aria-label={isMuted ? 'Unmute sound' : 'Mute sound'}
+          title={isMuted ? 'Unmute music' : 'Mute music'}
+          aria-label={isMuted ? 'Unmute music' : 'Mute music'}
         >
           {isMuted ? '🔇' : '🔊'}
         </button>

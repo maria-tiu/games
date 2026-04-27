@@ -187,8 +187,8 @@ export default function SlidingPuzzle() {
         <button
           className="sound-toggle-btn sliding-puzzle-sound-btn"
           onClick={() => toggleMute(!won && running)}
-          title={isMuted ? 'Unmute' : 'Mute'}
-          aria-label={isMuted ? 'Unmute sound' : 'Mute sound'}
+          title={isMuted ? 'Unmute music' : 'Mute music'}
+          aria-label={isMuted ? 'Unmute music' : 'Mute music'}
         >
           {isMuted ? '🔇' : '🔊'}
         </button>

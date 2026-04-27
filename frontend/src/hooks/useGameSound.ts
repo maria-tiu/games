@@ -257,7 +257,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
 
   // sliding-puzzle SFX
   const playTileSlide = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     const osc = ctx.createOscillator();
@@ -275,7 +274,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
 
   // 2048 SFX
   const playTileMove = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     const osc = ctx.createOscillator();
@@ -292,7 +290,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
   }, [initAudio]);
 
   const playMerge = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     [440, 554, 659].forEach((freq, i) => {
@@ -312,7 +309,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
 
   // breakout SFX
   const playPaddleHit = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     const osc = ctx.createOscillator();
@@ -329,7 +325,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
   }, [initAudio]);
 
   const playBrickBreak = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     const osc = ctx.createOscillator();
@@ -346,7 +341,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
   }, [initAudio]);
 
   const playLifeLost = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     [440, 349, 293, 220].forEach((freq, i) => {
@@ -366,7 +360,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
 
   // mario SFX
   const playJump = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     const osc = ctx.createOscillator();
@@ -383,7 +376,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
   }, [initAudio]);
 
   const playCoinCollect = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     [1318.51, 1567.98].forEach((freq, i) => {
@@ -402,7 +394,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
   }, [initAudio]);
 
   const playStomp = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     const osc = ctx.createOscillator();
@@ -420,7 +411,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
 
   // shared SFX
   const playWin = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5];
@@ -440,7 +430,6 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
   }, [initAudio]);
 
   const playGameOver = useCallback(() => {
-    if (isMutedRef.current) return;
     const ctx = initAudio();
     if (!ctx) return;
     const notes = [440.00, 349.23, 293.66, 246.94];

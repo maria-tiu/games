@@ -375,8 +375,8 @@ export default function BreakoutGame() {
         <button
           className="sound-toggle-btn"
           onClick={() => toggleMute(displayState.started && !displayState.gameOver && !displayState.won && !displayState.paused)}
-          title={soundIsMuted ? 'Unmute' : 'Mute'}
-          aria-label={soundIsMuted ? 'Unmute sound' : 'Mute sound'}
+          title={soundIsMuted ? 'Unmute music' : 'Mute music'}
+          aria-label={soundIsMuted ? 'Unmute music' : 'Mute music'}
         >
           {soundIsMuted ? '🔇' : '🔊'}
         </button>

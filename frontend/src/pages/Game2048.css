@@ -195,6 +195,21 @@
   line-height: 1.6;
 }
 
+.sound-toggle-btn {
+  background: transparent;
+  border: 1px solid #bbada0;
+  color: #776e65;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.sound-toggle-btn:hover {
+  color: #f65e3b;
+  border-color: #f65e3b;
+}
+
 @media (max-width: 520px) {
   .game-2048-board-wrapper,
   .game-2048-grid {

@@ -244,3 +244,22 @@
   max-width: 320px;
   line-height: 1.6;
 }
+
+.sound-toggle-btn {
+  background: transparent;
+  border: 1px solid #555;
+  color: #aaa;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.sound-toggle-btn:hover {
+  color: #fff;
+  border-color: #aaa;
+}
+.sliding-puzzle-sound-btn {
+  position: absolute;
+  right: 16px;
+}

@@ -197,6 +197,34 @@
   text-decoration: underline;
 }
 
+.sound-toggle-btn {
+  background: transparent;
+  border: 1px solid #555;
+  color: #aaa;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.sound-toggle-btn:hover {
+  color: #fff;
+  border-color: #aaa;
+}
+.dashboard-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.dashboard-title-row .dashboard-title {
+  margin-bottom: 0;
+}
+.dashboard-sound-btn {
+  flex-shrink: 0;
+}
+
 /* Score popup tooltip */
 .score-cell {
   position: relative;

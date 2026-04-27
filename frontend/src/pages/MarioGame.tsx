@@ -18,6 +18,8 @@ const MOVE_SPD = 4;
 const ENEMY_SPD = 1.5;
 const LIVES_INIT = 3;
 const TOTAL_LEVELS = 3;
+const RESPAWN_X = 50;
+const RESPAWN_Y = 414;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Platform { x: number; y: number; w: number; h: number }
@@ -193,7 +195,7 @@ function coinsForLevel(level: number): number {
 
 function initLevel(level: number, lives: number, score: number, started = true): GameState {
   return {
-    mx: 50, my: 414,
+    mx: RESPAWN_X, my: RESPAWN_Y,
     mvx: 0, mvy: 0,
     onGround: false,
     facingRight: true,
@@ -579,7 +581,7 @@ export default function MarioGame() {
         soundRef.current.stopMusic();
         setDisplayState((d) => ({ ...d, lives: 0, gameOver: true }));
       } else {
-        gs.mx = 50; gs.my = 414; gs.mvx = 0; gs.mvy = 0;
+        gs.mx = RESPAWN_X; gs.my = RESPAWN_Y; gs.mvx = 0; gs.mvy = 0;
         gs.onGround = false;
         gs.invincible = 120;
         gs.started = false;
@@ -643,7 +645,7 @@ export default function MarioGame() {
             soundRef.current.stopMusic();
             setDisplayState((d) => ({ ...d, lives: 0, gameOver: true }));
           } else {
-            gs.mx = 50; gs.my = 414; gs.mvx = 0; gs.mvy = 0;
+            gs.mx = RESPAWN_X; gs.my = RESPAWN_Y; gs.mvx = 0; gs.mvy = 0;
             gs.onGround = false;
             gs.invincible = 120;
             gs.started = false;
@@ -693,7 +695,7 @@ export default function MarioGame() {
             soundRef.current.stopMusic();
             setDisplayState((d) => ({ ...d, lives: 0, gameOver: true }));
           } else {
-            gs.mx = 50; gs.my = 414; gs.mvx = 0; gs.mvy = 0;
+            gs.mx = RESPAWN_X; gs.my = RESPAWN_Y; gs.mvx = 0; gs.mvy = 0;
             gs.onGround = false;
             gs.invincible = 120;
             gs.started = false;

@@ -36,7 +36,7 @@ export default function Dashboard() {
   const [popupPos, setPopupPos] = useState<{ bottom: number; right: number } | null>(null);
   const { playClick, playHover } = useUISound();
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { isMuted: soundIsMuted, startMusic, stopMusic, toggleMute } = useGameSound('dashboard');
+  const { startMusic, stopMusic } = useGameSound('dashboard');
   const musicStartedRef = useRef(false);
 
   useEffect(() => {
@@ -118,14 +118,7 @@ export default function Dashboard() {
     <div className="dashboard">
       <div className="dashboard-title-row">
         <h2 className="dashboard-title">Board of Games</h2>
-        <button
-          className="sound-toggle-btn dashboard-sound-btn"
-          onClick={() => toggleMute()}
-          title={soundIsMuted ? 'Unmute music' : 'Mute music'}
-          aria-label={soundIsMuted ? 'Unmute music' : 'Mute music'}
-        >
-          {soundIsMuted ? '🔇' : '🔊'}
-        </button>
+
       </div>
       <div className="dashboard-table-wrapper">
         <table className="dashboard-table">

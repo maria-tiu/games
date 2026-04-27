@@ -118,7 +118,7 @@ export default function MarioGame() {
   const authRef = useRef({ isLoggedIn, username, token });
   useEffect(() => { authRef.current = { isLoggedIn, username, token }; }, [isLoggedIn, username, token]);
 
-  const { isMuted: soundIsMuted, startMusic, stopMusic, playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin, toggleMute } = useGameSound('mario');
+  const { startMusic, stopMusic, playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin } = useGameSound('mario');
   const soundRef = useRef({ playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin, startMusic, stopMusic });
   useEffect(() => {
     soundRef.current = { playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin, startMusic, stopMusic };
@@ -532,14 +532,7 @@ export default function MarioGame() {
     <div className="mario-page">
       <div className="mario-top-bar">
         <button className="mario-back-btn" onClick={() => void handleBack()}>← Back to Dashboard</button>
-        <button
-          className="sound-toggle-btn"
-          onClick={() => toggleMute(displayState.started && !displayState.gameOver && !displayState.won && !displayState.paused)}
-          title={soundIsMuted ? 'Unmute music' : 'Mute music'}
-          aria-label={soundIsMuted ? 'Unmute music' : 'Mute music'}
-        >
-          {soundIsMuted ? '🔇' : '🔊'}
-        </button>
+
         <button
           className="btn-info mario-info-btn"
           onClick={() => setShowInstructions(true)}

@@ -19,7 +19,7 @@ export default function Game2048() {
   const navigate = useNavigate();
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
-  const { isMuted, startMusic, playTileMove, playMerge, playWin: playSoundWin, playGameOver, toggleMute } = useGameSound('2048');
+  const { startMusic, playTileMove, playMerge, playWin: playSoundWin, playGameOver } = useGameSound('2048');
   const hasStartedRef = useRef(false);
   const prevScoreRef = useRef(0);
   const wonPlayedRef = useRef(false);
@@ -173,14 +173,7 @@ export default function Game2048() {
             <div className="score-box-value">{state.best}</div>
           </div>
         </div>
-        <button
-          className="sound-toggle-btn"
-          onClick={() => toggleMute(!state.gameOver && !state.won)}
-          title={isMuted ? 'Unmute music' : 'Mute music'}
-          aria-label={isMuted ? 'Unmute music' : 'Mute music'}
-        >
-          {isMuted ? '🔇' : '🔊'}
-        </button>
+
       </div>
 
       <div className="game-2048-controls">

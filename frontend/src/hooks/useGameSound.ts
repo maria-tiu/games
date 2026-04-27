@@ -2,6 +2,95 @@ import { useRef, useCallback, useEffect, useState } from 'react';
 
 export type GameSoundTheme = 'sliding-puzzle' | '2048' | 'breakout' | 'mario' | 'dashboard';
 
+// ── Note durations ─────────────────────────────────────────────────────────────
+const DB_W = 2.0;
+
+const SP_Q = 0.6;
+
+const J_Q = 0.667;
+const J_E = J_Q / 2;
+
+const BR_Q = 0.375;
+const BR_E = BR_Q / 2;
+
+const M_Q = 0.3;
+const M_E = M_Q / 2;
+const M_S = M_E / 2;
+const M_DQ = M_Q * 1.5;
+
+// ── Melodies: [freq_hz, duration_s] — freq 0 = rest ───────────────────────────
+
+const DASHBOARD_THEME: [number, number][] = [
+  [261.63, DB_W], [329.63, DB_W], [392.00, DB_W], [523.25, DB_W],
+  [392.00, DB_W], [329.63, DB_W], [293.66, DB_W], [261.63, DB_W],
+  [0,      DB_W],
+  [261.63, DB_W], [392.00, DB_W], [329.63, DB_W], [440.00, DB_W],
+  [392.00, DB_W], [349.23, DB_W], [329.63, DB_W],
+];
+
+const SLIDING_PUZZLE_THEME: [number, number][] = [
+  [523.25, SP_Q], [587.33, SP_Q], [659.25, SP_Q], [783.99, SP_Q],
+  [880.00, SP_Q], [783.99, SP_Q], [659.25, SP_Q], [587.33, SP_Q],
+  [523.25, SP_Q], [659.25, SP_Q], [783.99, SP_Q], [880.00, SP_Q],
+  [659.25, SP_Q], [587.33, SP_Q], [523.25, SP_Q], [0, SP_Q],
+  [587.33, SP_Q], [659.25, SP_Q], [783.99, SP_Q], [659.25, SP_Q],
+  [523.25, SP_Q], [440.00, SP_Q], [523.25, SP_Q], [587.33, SP_Q],
+  [659.25, SP_Q], [523.25, SP_Q], [587.33, SP_Q], [659.25, SP_Q],
+  [783.99, SP_Q], [659.25, SP_Q], [523.25, SP_Q], [0, SP_Q],
+];
+
+const GAME2048_THEME: [number, number][] = [
+  [261.63, J_Q], [329.63, J_E], [392.00, J_E], [493.88, J_Q], [392.00, J_E], [329.63, J_E],
+  [440.00, J_Q], [523.25, J_E], [587.33, J_E], [523.25, J_Q], [440.00, J_Q],
+  [392.00, J_Q], [329.63, J_E], [261.63, J_E], [293.66, J_Q], [329.63, J_Q],
+  [261.63, J_Q], [0, J_Q],
+  [220.00, J_Q], [261.63, J_E], [329.63, J_E], [392.00, J_Q], [329.63, J_E], [261.63, J_E],
+  [349.23, J_Q], [440.00, J_E], [523.25, J_E], [440.00, J_Q], [349.23, J_Q],
+  [329.63, J_Q], [261.63, J_E], [220.00, J_E], [246.94, J_Q], [261.63, J_Q],
+  [220.00, J_Q], [0, J_Q],
+];
+
+const BREAKOUT_THEME: [number, number][] = [
+  [523.25, BR_E], [659.25, BR_E], [783.99, BR_Q], [659.25, BR_E], [783.99, BR_E],
+  [880.00, BR_Q], [0, BR_E], [880.00, BR_E], [783.99, BR_Q],
+  [659.25, BR_E], [783.99, BR_E], [659.25, BR_E], [523.25, BR_E], [440.00, BR_Q],
+  [523.25, BR_E], [659.25, BR_E],
+  [698.46, BR_E], [783.99, BR_E], [880.00, BR_Q], [783.99, BR_E], [698.46, BR_E],
+  [659.25, BR_Q], [0, BR_E], [659.25, BR_E], [783.99, BR_Q],
+  [523.25, BR_E], [587.33, BR_E], [523.25, BR_E], [493.88, BR_E], [440.00, BR_Q],
+  [523.25, BR_E], [523.25, BR_E],
+];
+
+const MARIO_THEME: [number, number][] = [
+  [659.25, M_E], [0, M_S], [659.25, M_E], [0, M_Q],
+  [523.25, M_E], [659.25, M_E], [0, M_Q],
+  [783.99, M_Q], [0, M_Q], [392.00, M_Q], [0, M_Q],
+  [523.25, M_E], [0, M_Q], [392.00, M_E], [0, M_Q],
+  [329.63, M_E], [0, M_Q],
+  [440.00, M_E], [0, M_E], [493.88, M_E], [0, M_E],
+  [466.16, M_E], [440.00, M_E],
+  [392.00, M_DQ], [659.25, M_DQ], [783.99, M_DQ],
+  [880.00, M_E], [698.46, M_E], [783.99, M_E],
+  [0, M_E], [659.25, M_E], [523.25, M_E], [587.33, M_E], [493.88, M_E],
+  [0, M_Q],
+];
+
+// ── Oscillator types and melody lookup per theme ───────────────────────────────
+const THEME_OSC_TYPE: Record<GameSoundTheme, OscillatorType> = {
+  'dashboard':      'sine',
+  'sliding-puzzle': 'triangle',
+  '2048':           'sine',
+  'breakout':       'square',
+  'mario':          'square',
+};
+
+const THEME_MELODY: Record<GameSoundTheme, [number, number][]> = {
+  'dashboard':      DASHBOARD_THEME,
+  'sliding-puzzle': SLIDING_PUZZLE_THEME,
+  '2048':           GAME2048_THEME,
+  'breakout':       BREAKOUT_THEME,
+  'mario':          MARIO_THEME,
+};
 
 const THEME_GAIN: Record<GameSoundTheme, number> = {
   'dashboard':      0.15,
@@ -62,6 +151,7 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
   const musicTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const noteIndexRef = useRef(0);
   const isMusicActiveRef = useRef(false);
   const isMutedRef = useRef(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -86,9 +176,39 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
   }, [theme]);
 
 
+  const scheduleNextNote = useCallback(function scheduleNextNote() {
+    if (!isMusicActiveRef.current || isMutedRef.current) return;
+    const ctx = audioCtxRef.current;
+    const master = masterGainRef.current;
+    if (!ctx || !master) return;
+
+    const melody = THEME_MELODY[theme];
+    const [freq, duration] = melody[noteIndexRef.current];
+    noteIndexRef.current = (noteIndexRef.current + 1) % melody.length;
+
+    if (freq > 0) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(master);
+      osc.type = THEME_OSC_TYPE[theme];
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.28, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration * 0.85);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+    }
+
+    musicTimerRef.current = setTimeout(scheduleNextNote, duration * 1000);
+  }, [theme]);
+
   const startMusic = useCallback(() => {
-    return; // music disabled
-  }, []);
+    if (isMusicActiveRef.current) return;
+    initAudio();
+    isMusicActiveRef.current = true;
+    noteIndexRef.current = 0;
+    scheduleNextNote();
+  }, [initAudio, scheduleNextNote]);
 
   const stopMusic = useCallback(() => {
     isMusicActiveRef.current = false;
@@ -107,8 +227,11 @@ export function useGameSound(theme: GameSoundTheme): BaseSound {
   }, []);
 
   const resumeMusic = useCallback(() => {
-    return; // music disabled
-  }, []);
+    if (isMusicActiveRef.current || isMutedRef.current) return;
+    initAudio();
+    isMusicActiveRef.current = true;
+    scheduleNextNote();
+  }, [initAudio, scheduleNextNote]);
 
   // ── Sound effects ────────────────────────────────────────────────────────────
 

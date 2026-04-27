@@ -118,7 +118,7 @@ export default function MarioGame() {
   const authRef = useRef({ isLoggedIn, username, token });
   useEffect(() => { authRef.current = { isLoggedIn, username, token }; }, [isLoggedIn, username, token]);
 
-  const { startMusic, stopMusic, playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin } = useGameSound('mario');
+  const { isMuted: soundIsMuted, startMusic, stopMusic, playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin, toggleMute } = useGameSound('mario');
   const soundRef = useRef({ playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin, startMusic, stopMusic });
   useEffect(() => {
     soundRef.current = { playJump, playCoinCollect, playStomp, playGameOver, playWin: playSoundWin, startMusic, stopMusic };
@@ -539,6 +539,14 @@ export default function MarioGame() {
           title="How to play Mario"
           aria-label="How to play Mario"
         >?</button>
+        <button
+          className="sound-toggle-btn"
+          onClick={() => toggleMute(displayState.started && !displayState.gameOver && !displayState.won && !displayState.paused)}
+          title={soundIsMuted ? 'Unmute music' : 'Mute music'}
+          aria-label={soundIsMuted ? 'Unmute music' : 'Mute music'}
+        >
+          {soundIsMuted ? '🔇' : '🔊'}
+        </button>
       </div>
 
       <header className="mario-header">

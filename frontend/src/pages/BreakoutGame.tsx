@@ -108,7 +108,7 @@ export default function BreakoutGame() {
     authRef.current = { isLoggedIn, username, token };
   }, [isLoggedIn, username, token]);
 
-  const { startMusic, stopMusic, playPaddleHit, playBrickBreak, playLifeLost, playWin: playSoundWin, playGameOver } = useGameSound('breakout');
+  const { isMuted: soundIsMuted, startMusic, stopMusic, playPaddleHit, playBrickBreak, playLifeLost, playWin: playSoundWin, playGameOver, toggleMute } = useGameSound('breakout');
   const soundRef = useRef({ playPaddleHit, playBrickBreak, playLifeLost, playWin: playSoundWin, playGameOver, startMusic, stopMusic });
   useEffect(() => {
     soundRef.current = { playPaddleHit, playBrickBreak, playLifeLost, playWin: playSoundWin, playGameOver, startMusic, stopMusic };
@@ -379,6 +379,14 @@ export default function BreakoutGame() {
           title="How to play Breakout"
           aria-label="How to play Breakout"
         >?</button>
+        <button
+          className="sound-toggle-btn"
+          onClick={() => toggleMute(displayState.started && !displayState.gameOver && !displayState.won && !displayState.paused)}
+          title={soundIsMuted ? 'Unmute music' : 'Mute music'}
+          aria-label={soundIsMuted ? 'Unmute music' : 'Mute music'}
+        >
+          {soundIsMuted ? '🔇' : '🔊'}
+        </button>
       </div>
 
       <header className="breakout-header">

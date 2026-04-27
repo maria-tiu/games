@@ -63,7 +63,7 @@ export default function SlidingPuzzle() {
   const [won, setWon] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [running, setRunning] = useState(true);
-  const { startMusic, stopMusic, playTileSlide, playWin: playSoundWin } = useGameSound('sliding-puzzle');
+  const { isMuted, startMusic, stopMusic, playTileSlide, playWin: playSoundWin, toggleMute } = useGameSound('sliding-puzzle');
   const hasStartedRef = useRef(false);
 
   const startNewGame = useCallback((newSize?: number) => {
@@ -184,7 +184,14 @@ export default function SlidingPuzzle() {
 
       <header className="sliding-puzzle-header">
         <h1 className="sliding-puzzle-title">SLIDING PUZZLE</h1>
-
+          <button
+            className="sound-toggle-btn sliding-puzzle-sound-btn"
+            onClick={() => toggleMute(!won && running)}
+            title={isMuted ? 'Unmute music' : 'Mute music'}
+            aria-label={isMuted ? 'Unmute music' : 'Mute music'}
+          >
+            {isMuted ? '🔇' : '🔊'}
+          </button>
       </header>
 
       <main className="sliding-puzzle-main">

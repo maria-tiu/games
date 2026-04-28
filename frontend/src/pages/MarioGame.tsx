@@ -771,9 +771,11 @@ export default function MarioGame() {
   // ── Restart ───────────────────────────────────────────────────────────────────
   const handleRestart = useCallback(() => {
     stopMusic();
-    stateRef.current = initState();
+    const failedLevel = stateRef.current.level;
+    stateRef.current = initLevel(failedLevel, LIVES_INIT, 0, false);
     scoreSubmittedRef.current = false;
     scorePromiseRef.current = Promise.resolve();
+    const bossHp = failedLevel === TOTAL_LEVELS ? 3 : 0;
     setDisplayState({
       score: 0,
       lives: LIVES_INIT,
@@ -781,11 +783,11 @@ export default function MarioGame() {
       gameOver: false,
       won: false,
       paused: false,
-      coinsLeft: coinsForLevel(1),
-      level: 1,
+      coinsLeft: coinsForLevel(failedLevel),
+      level: failedLevel,
       levelComplete: false,
-      bossHp: 0,
-      bossMaxHp: 0,
+      bossHp,
+      bossMaxHp: bossHp,
     });
   }, [stopMusic]);
 
@@ -926,7 +928,8 @@ export default function MarioGame() {
           <div className="mario-overlay mario-overlay--gameover">
             <span className="mario-overlay-title">GAME OVER</span>
             <p className="mario-overlay-sub">Final Score: {displayState.score}</p>
-            <button className="mario-btn" onClick={handleRestart}>Play Again</button>
+            <p className="mario-overlay-sub">Retry from Level {displayState.level}</p>
+            <button className="mario-btn" onClick={handleRestart}>Try Again</button>
           </div>
         )}
 

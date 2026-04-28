@@ -796,11 +796,11 @@ export default function MarioGame() {
     soundRef.current.stopMusic();
     const gs = stateRef.current;
     const nextLevel = gs.level + 1;
-    stateRef.current = initLevel(nextLevel, gs.lives, gs.score, false);
+    stateRef.current = initLevel(nextLevel, LIVES_INIT, gs.score, false);
     const bossHp = nextLevel === TOTAL_LEVELS ? 3 : 0;
     setDisplayState({
       score: gs.score,
-      lives: gs.lives,
+      lives: LIVES_INIT,
       started: false,
       gameOver: false,
       won: false,

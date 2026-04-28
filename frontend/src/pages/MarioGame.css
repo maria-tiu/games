@@ -117,6 +117,10 @@
   color: #2ed573;
 }
 
+.mario-overlay--levelcomplete .mario-overlay-title {
+  color: #ffd700;
+}
+
 .mario-overlay-title {
   font-size: 38px;
   font-weight: 900;

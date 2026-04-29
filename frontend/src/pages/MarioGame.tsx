@@ -167,7 +167,6 @@ function makeEnemies(level: number): Enemy[] {
     { x: 610, y: 221, w: 28, h: 28, vx: spd, alive: true, patrolLeft: 600, patrolRight: 720 },
   ];
   if (level === 2) return [
-    { x: 60,  y: 414, w: 28, h: 28, vx: spd, alive: true, patrolLeft: 0,   patrolRight: 200 },
     { x: 300, y: 414, w: 28, h: 28, vx: spd, alive: true, patrolLeft: 250, patrolRight: 450 },
     { x: 600, y: 414, w: 28, h: 28, vx: spd, alive: true, patrolLeft: 500, patrolRight: 770 },
     { x: 210, y: 284, w: 28, h: 28, vx: spd, alive: true, patrolLeft: 200, patrolRight: 290 },

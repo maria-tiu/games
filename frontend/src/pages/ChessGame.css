@@ -233,12 +233,6 @@
 
 .chess-file-labels {
   display: flex;
-  width: 62px * 8;
-  padding-left: 30px; /* align with board (rank labels width + gap) */
-}
-
-.chess-file-labels {
-  display: flex;
   padding-left: 30px;
 }
 

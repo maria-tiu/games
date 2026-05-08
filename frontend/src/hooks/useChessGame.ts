@@ -86,6 +86,30 @@ function isOnBoard(r: number, c: number): boolean {
   return r >= 0 && r < 8 && c >= 0 && c < 8;
 }
 
+// Slide along a direction and push reachable squares into `moves`
+function slideDir(
+  board: Board,
+  moves: [number, number][],
+  color: Color,
+  r: number,
+  c: number,
+  dr: number,
+  dc: number,
+): void {
+  let tr = r + dr;
+  let tc = c + dc;
+  while (isOnBoard(tr, tc)) {
+    const target = board[tr][tc];
+    if (target) {
+      if (target.color !== color) moves.push([tr, tc]);
+      break;
+    }
+    moves.push([tr, tc]);
+    tr += dr;
+    tc += dc;
+  }
+}
+
 // ── Pseudo-legal move generation ──────────────────────────────────────────────
 function getPseudoLegalMoves(
   board: Board,
@@ -106,21 +130,6 @@ function getPseudoLegalMoves(
     if (target && target.color === color) return false;
     moves.push([tr, tc]);
     return !target;
-  };
-
-  const slide = (dr: number, dc: number) => {
-    let tr = r + dr;
-    let tc = c + dc;
-    while (isOnBoard(tr, tc)) {
-      const target = board[tr][tc];
-      if (target) {
-        if (target.color !== color) moves.push([tr, tc]);
-        break;
-      }
-      moves.push([tr, tc]);
-      tr += dr;
-      tc += dc;
-    }
   };
 
   switch (type) {
@@ -160,14 +169,18 @@ function getPseudoLegalMoves(
       break;
     }
     case 'B':
-      slide(-1, -1); slide(-1, 1); slide(1, -1); slide(1, 1);
+      slideDir(board, moves, color, r, c, -1, -1); slideDir(board, moves, color, r, c, -1, 1);
+      slideDir(board, moves, color, r, c,  1, -1); slideDir(board, moves, color, r, c,  1, 1);
       break;
     case 'R':
-      slide(-1, 0); slide(1, 0); slide(0, -1); slide(0, 1);
+      slideDir(board, moves, color, r, c, -1, 0); slideDir(board, moves, color, r, c, 1, 0);
+      slideDir(board, moves, color, r, c,  0, -1); slideDir(board, moves, color, r, c, 0, 1);
       break;
     case 'Q':
-      slide(-1, -1); slide(-1, 1); slide(1, -1); slide(1, 1);
-      slide(-1, 0); slide(1, 0); slide(0, -1); slide(0, 1);
+      slideDir(board, moves, color, r, c, -1, -1); slideDir(board, moves, color, r, c, -1, 1);
+      slideDir(board, moves, color, r, c,  1, -1); slideDir(board, moves, color, r, c,  1, 1);
+      slideDir(board, moves, color, r, c, -1, 0); slideDir(board, moves, color, r, c, 1, 0);
+      slideDir(board, moves, color, r, c,  0, -1); slideDir(board, moves, color, r, c, 0, 1);
       break;
     case 'K': {
       const kingDeltas: [number, number][] = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];

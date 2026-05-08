@@ -160,7 +160,7 @@ export default function ChessGame() {
           <div className="chess-panel chess-captures-panel">
             <div className="chess-panel-label">Captured by you</div>
             <div className="chess-captures">
-              {sortCaptured(capturedByWhite).map((p, i) => (
+              {sortCaptured(playerColor === 'white' ? capturedByWhite : capturedByBlack).map((p, i) => (
                 <span key={i} className="chess-captured-piece">
                   {PIECE_SYMBOLS[`${p.color}-${p.type}`]}
                 </span>
@@ -168,7 +168,7 @@ export default function ChessGame() {
             </div>
             <div className="chess-panel-label" style={{ marginTop: 8 }}>Captured by bot</div>
             <div className="chess-captures">
-              {sortCaptured(capturedByBlack).map((p, i) => (
+              {sortCaptured(playerColor === 'white' ? capturedByBlack : capturedByWhite).map((p, i) => (
                 <span key={i} className="chess-captured-piece">
                   {PIECE_SYMBOLS[`${p.color}-${p.type}`]}
                 </span>

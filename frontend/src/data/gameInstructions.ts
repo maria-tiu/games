@@ -105,4 +105,19 @@ export const GAME_INSTRUCTIONS: Record<string, GameInstructionsData> = {
       'The tunnel on row 9 wraps around — use it to lose a chasing ghost!',
     ],
   },
+  chess: {
+    title: 'How to play Chess',
+    description:
+      'Play chess against one of five computer opponents, from a random-move Novice up to a depth-4 Hard bot. Move pieces by clicking on them, then clicking the destination square. Capture the opponent\'s king to win!',
+    controls: [
+      { key: 'Click piece', action: 'Select a piece (legal moves are highlighted)' },
+      { key: 'Click square', action: 'Move selected piece to that square' },
+    ],
+    tips: [
+      'Control the center early — occupy or attack e4, d4, e5, d5.',
+      'Castle early to keep your king safe.',
+      'Each bot has a distinct personality: Beginner grabs captures, higher bots plan ahead.',
+      'If you see "in check", you MUST move your king out of check.',
+    ],
+  },
 };

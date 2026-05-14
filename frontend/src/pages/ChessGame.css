@@ -171,7 +171,6 @@
 
 .chess-captured-piece {
   font-size: 1.1rem;
-  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Arial Unicode MS', serif;
 }
 
 .chess-captured-piece.white {
@@ -307,10 +306,10 @@
   position: relative;
   z-index: 2;
   display: block;
-  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Arial Unicode MS', serif;
 }
 
-.chess-piece.white {
+.chess-piece.white,
+.chess-promotion-btn.white {
   color: #f9f9f4;
   text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,0.6);
   -webkit-text-stroke: 0.4px #2f2012;
@@ -460,12 +459,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Arial Unicode MS', serif;
 }
 
-.chess-promotion-btn.white {
-  color: #f9f9f4;
-  -webkit-text-stroke: 0.4px #2f2012;
+.chess-piece,
+.chess-captured-piece,
+.chess-promotion-btn {
+  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'DejaVu Sans', 'Arial Unicode MS', sans-serif;
 }
 
 .chess-promotion-btn.black {

@@ -171,7 +171,17 @@
 
 .chess-captured-piece {
   font-size: 1.1rem;
-  opacity: 0.85;
+  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Arial Unicode MS', serif;
+}
+
+.chess-captured-piece.white {
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.chess-captured-piece.black {
+  color: #1a1a1a;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
 /* ── Board Area ─────────────────────────────────────────────────────────────── */
@@ -297,12 +307,13 @@
   position: relative;
   z-index: 2;
   display: block;
+  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Arial Unicode MS', serif;
 }
 
 .chess-piece.white {
-  color: #ffffff;
+  color: #f9f9f4;
   text-shadow: 0 1px 3px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,0.6);
-  -webkit-text-stroke: 0.8px #4a3000;
+  -webkit-text-stroke: 0.4px #2f2012;
 }
 
 .chess-piece.black {
@@ -449,6 +460,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Arial Unicode MS', serif;
+}
+
+.chess-promotion-btn.white {
+  color: #f9f9f4;
+  -webkit-text-stroke: 0.4px #2f2012;
+}
+
+.chess-promotion-btn.black {
+  color: #1a1a1a;
 }
 
 .chess-promotion-btn:hover {

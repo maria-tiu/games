@@ -120,4 +120,20 @@ export const GAME_INSTRUCTIONS: Record<string, GameInstructionsData> = {
       'If you see "in check", you MUST move your king out of check.',
     ],
   },
+  'geometry-dash': {
+    title: 'How to play Geometry Dash',
+    description:
+      'Geometry Dash is a timing game where your cube auto-runs forward. Jump over spikes and blocks to reach the end. There are 10 separate levels, each with its own obstacle rhythm and speed.',
+    controls: [
+      { key: 'Space / ↑', action: 'Jump' },
+      { key: 'Enter', action: 'Start / Restart the current level' },
+      { key: '1–0', action: 'Quick-select level 1 to 10' },
+      { key: 'Click level button', action: 'Switch to a different level' },
+    ],
+    tips: [
+      'Every level is distinct, so practice the timing pattern for each one.',
+      'Jump as late as possible for short spikes and earlier for stacked obstacles.',
+      'Use easier levels first, then progress to the faster late levels.',
+    ],
+  },
 };

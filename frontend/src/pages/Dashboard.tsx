@@ -25,6 +25,7 @@ const GAMES: Game[] = [
   { id: 'mario',          name: 'Mario',           players: 1, route: '/mario'          },
   { id: 'pacman',  name: 'Pac-Man', players: 1, route: '/pacman' },
   { id: 'chess',   name: 'Chess',   players: 1, route: '/chess'  },
+  { id: 'geometry-dash', name: 'Geometry Dash', players: 1, route: '/geometry-dash' },
 ];
 
 export default function Dashboard() {

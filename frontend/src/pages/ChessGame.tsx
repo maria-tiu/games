@@ -9,8 +9,8 @@ import './ChessGame.css';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const PIECE_SYMBOLS: Record<string, string> = {
-  'white-K': '♔', 'white-Q': '♕', 'white-R': '♖',
-  'white-B': '♗', 'white-N': '♘', 'white-P': '♙',
+  'white-K': '♚', 'white-Q': '♛', 'white-R': '♜',
+  'white-B': '♝', 'white-N': '♞', 'white-P': '♟',
   'black-K': '♚', 'black-Q': '♛', 'black-R': '♜',
   'black-B': '♝', 'black-N': '♞', 'black-P': '♟',
 };
@@ -161,7 +161,7 @@ export default function ChessGame() {
             <div className="chess-panel-label">Captured by you</div>
             <div className="chess-captures">
               {sortCaptured(playerColor === 'white' ? capturedByWhite : capturedByBlack).map((p, i) => (
-                <span key={i} className="chess-captured-piece">
+                <span key={i} className={`chess-captured-piece ${p.color}`}>
                   {PIECE_SYMBOLS[`${p.color}-${p.type}`]}
                 </span>
               ))}
@@ -169,7 +169,7 @@ export default function ChessGame() {
             <div className="chess-panel-label" style={{ marginTop: 8 }}>Captured by bot</div>
             <div className="chess-captures">
               {sortCaptured(playerColor === 'white' ? capturedByBlack : capturedByWhite).map((p, i) => (
-                <span key={i} className="chess-captured-piece">
+                <span key={i} className={`chess-captured-piece ${p.color}`}>
                   {PIECE_SYMBOLS[`${p.color}-${p.type}`]}
                 </span>
               ))}
@@ -275,7 +275,7 @@ export default function ChessGame() {
               {promotionPieces.map(pt => (
                 <button
                   key={pt}
-                  className="chess-promotion-btn"
+                  className={`chess-promotion-btn ${playerColor}`}
                   onClick={() => promote(pt)}
                 >
                   {PIECE_SYMBOLS[`${playerColor}-${pt}`]}

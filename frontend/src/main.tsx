@@ -16,6 +16,7 @@ import BreakoutGame from './pages/BreakoutGame.tsx'
 import MarioGame from './pages/MarioGame.tsx'
 import PacmanGame from './pages/PacmanGame.tsx'
 import ChessGame from './pages/ChessGame.tsx'
+import GeometryDash from './pages/GeometryDash.tsx'
 import ProfilePage from './pages/ProfilePage.tsx'
 
 createRoot(document.getElementById('root')!).render(
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/mario" element={<MarioGame />} />
               <Route path="/pacman" element={<PacmanGame />} />
               <Route path="/chess" element={<ChessGame />} />
+              <Route path="/geometry-dash" element={<GeometryDash />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>

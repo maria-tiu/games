@@ -1,0 +1,160 @@
+.geometry-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0f1024 0%, #1a1c3b 100%);
+  color: #e8ecff;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px 32px;
+  box-sizing: border-box;
+}
+
+.geometry-topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.geometry-back-btn,
+.geometry-start-btn {
+  background: transparent;
+  border: 1px solid #4d57a8;
+  color: #e8ecff;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.geometry-back-btn:hover,
+.geometry-start-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.geometry-title {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+  color: #6ee7ff;
+}
+
+.geometry-panel {
+  margin: 20px auto 12px;
+  width: min(960px, 100%);
+  padding: 14px;
+  border: 1px solid #39417f;
+  border-radius: 12px;
+  background: rgba(8, 10, 33, 0.72);
+}
+
+.geometry-level-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.geometry-level-btn {
+  border: 1px solid #4e57a8;
+  background: #1f2554;
+  color: #d8ddff;
+  border-radius: 8px;
+  padding: 8px 0;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.geometry-level-btn.active {
+  background: #55d6ff;
+  color: #10163b;
+  border-color: #55d6ff;
+}
+
+.geometry-level-name {
+  margin-top: 12px;
+  font-weight: 700;
+}
+
+.geometry-status {
+  margin-top: 6px;
+  color: #9bc6ff;
+  font-size: 0.95rem;
+}
+
+.geometry-track-wrap {
+  width: min(960px, 100%);
+  margin: 0 auto;
+}
+
+.geometry-progress-track {
+  height: 10px;
+  background: #232857;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 0 10px;
+}
+
+.geometry-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #44d6ff, #9a6dff);
+}
+
+.geometry-track {
+  position: relative;
+  width: 100%;
+  height: 290px;
+  border: 1px solid #3d478f;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(33, 40, 84, 0.75), rgba(18, 22, 52, 0.95)),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.06) 0,
+      rgba(255, 255, 255, 0.06) 2px,
+      transparent 2px,
+      transparent 52px
+    );
+  overflow: hidden;
+}
+
+.geometry-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  background: linear-gradient(180deg, #1fd5ff 0%, #1a8ac2 100%);
+}
+
+.geometry-player {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #ffeb3b, #ff9800);
+  box-shadow: 0 0 12px rgba(255, 201, 72, 0.8);
+}
+
+.geometry-obstacle {
+  position: absolute;
+  bottom: 40px;
+  background: linear-gradient(180deg, #ff5f6d, #ff2e43);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+@media (max-width: 760px) {
+  .geometry-page {
+    padding: 10px 10px 20px;
+  }
+
+  .geometry-level-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .geometry-topbar {
+    flex-wrap: wrap;
+  }
+
+  .geometry-title {
+    width: 100%;
+    order: -1;
+  }
+}

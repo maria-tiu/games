@@ -23,6 +23,14 @@ const BOT_NAMES: Record<BotDifficulty, string> = {
   5: 'Hard Harry',
 };
 
+const BOT_ELO: Record<BotDifficulty, number> = {
+  1: 800,
+  2: 1000,
+  3: 1200,
+  4: 1400,
+  5: 1600,
+};
+
 const BOT_STARS: Record<BotDifficulty, string> = {
   1: '★☆☆☆☆',
   2: '★★☆☆☆',
@@ -151,7 +159,7 @@ export default function ChessGame() {
                 className={`chess-bot-btn ${botDifficulty === d ? 'active' : ''}`}
                 onClick={() => setBot(d)}
               >
-                <span className="chess-bot-name">{BOT_NAMES[d]}</span>
+                <span className="chess-bot-name">{BOT_NAMES[d]} ({BOT_ELO[d]} Elo)</span>
                 <span className="chess-bot-stars">{BOT_STARS[d]}</span>
               </button>
             ))}
@@ -292,7 +300,7 @@ export default function ChessGame() {
           <div className="chess-gameover-dialog">
             <div className="chess-gameover-title">
               {status === 'checkmate' && winner === playerColor && '🏆 You Win!'}
-              {status === 'checkmate' && winner !== playerColor && '☠️ You Lose'}
+              {status === 'checkmate' && winner !== playerColor && 'You Lose'}
               {(status === 'stalemate' || status === 'draw') && '🤝 Draw'}
             </div>
             <div className="chess-gameover-subtitle">{statusMessage()}</div>

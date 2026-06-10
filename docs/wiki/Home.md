@@ -20,6 +20,8 @@ Welcome to the **Games** project wiki! This is a collection of classic browser g
 | [Game — Breakout](Game-Breakout.md) | Breakout mechanics |
 | [Game — Mario](Game-Mario.md) | Mario mechanics |
 | [Game — Pac-Man](Game-Pac-Man.md) | Pac-Man mechanics |
+| [Game — Chess](Game-Chess.md) | Chess mechanics & bot AI |
+| [Game — Geometry Dash](Game-Geometry-Dash.md) | Geometry Dash mechanics |
 
 ---
 
@@ -30,7 +32,7 @@ Welcome to the **Games** project wiki! This is a collection of classic browser g
 - Browse a catalogue of classic games on the **Dashboard**
 - **Register** and **log in** to save personal playlists and scores
 - Add games to a personal **playlist** visible on their Profile page
-- **Play** six fully-implemented games directly in the browser
+- **Play** eight fully-implemented games directly in the browser
 - Submit scores to a global **leaderboard**
 - Switch between **dark and light themes**
 
@@ -56,3 +58,5 @@ Welcome to the **Games** project wiki! This is a collection of classic browser g
 | 4 | Breakout | `/breakout` | Bounce a ball to destroy brick rows |
 | 5 | Mario | `/mario` | Platformer — collect coins, stomp enemies |
 | 6 | Pac-Man | `/pacman` | Eat all dots in a maze, avoid ghosts |
+| 7 | Chess | `/chess` | Play chess against a bot (5 difficulty levels) |
+| 8 | Geometry Dash | `/geometry-dash` | Auto-runner — jump over obstacles across 10 levels |

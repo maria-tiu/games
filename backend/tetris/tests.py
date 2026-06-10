@@ -115,3 +115,84 @@ class UserScoreHistoryTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])
+
+
+class LoginSecurityTest(TestCase):
+    """API2:2023 – Broken Authentication: username enumeration & generic errors."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse('auth-login')
+        self.user = User.objects.create_user(
+            username='secuser', email='sec@example.com', password='StrongPass1!'
+        )
+
+    def test_login_success_returns_token(self):
+        response = self.client.post(
+            self.url, {'username': 'secuser', 'password': 'StrongPass1!'}, format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('token', response.data)
+
+    def test_login_wrong_password_returns_generic_error(self):
+        response = self.client.post(
+            self.url, {'username': 'secuser', 'password': 'WrongPass!'}, format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        # Must NOT reveal that the username exists (OWASP API2:2023)
+        self.assertNotIn('Username not found', response.data.get('detail', ''))
+        self.assertNotIn('Incorrect password', response.data.get('detail', ''))
+        self.assertEqual(response.data['detail'], 'Invalid credentials.')
+
+    def test_login_nonexistent_user_returns_same_generic_error(self):
+        response = self.client.post(
+            self.url, {'username': 'ghost', 'password': 'any'}, format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        # Exact same message as wrong-password – no enumeration possible
+        self.assertEqual(response.data['detail'], 'Invalid credentials.')
+
+
+class ScoreValidationTest(TestCase):
+    """API3:2023 – Broken Object Property Level Authorization: reject invalid score values."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse('score-list-create')
+
+    def _valid_payload(self, **overrides):
+        base = {'player_name': 'Tester', 'score': 100, 'lines_cleared': 5, 'level': 1}
+        base.update(overrides)
+        return base
+
+    def test_negative_score_rejected(self):
+        response = self.client.post(self.url, self._valid_payload(score=-1), format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_score_above_max_rejected(self):
+        response = self.client.post(self.url, self._valid_payload(score=10_000_001), format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_negative_lines_cleared_rejected(self):
+        response = self.client.post(self.url, self._valid_payload(lines_cleared=-1), format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_lines_cleared_above_max_rejected(self):
+        response = self.client.post(self.url, self._valid_payload(lines_cleared=10_001), format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_level_zero_rejected(self):
+        response = self.client.post(self.url, self._valid_payload(level=0), format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_level_above_max_rejected(self):
+        response = self.client.post(self.url, self._valid_payload(level=1_001), format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_valid_boundary_values_accepted(self):
+        response = self.client.post(
+            self.url,
+            self._valid_payload(score=10_000_000, lines_cleared=10_000, level=1_000),
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)

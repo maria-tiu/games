@@ -5,6 +5,12 @@ from .models import Score, UserGame
 
 
 class ScoreSerializer(serializers.ModelSerializer):
+    # Enforce sensible bounds to prevent garbage or malicious data injection
+    # (OWASP API3:2023 – Broken Object Property Level Authorization).
+    score = serializers.IntegerField(min_value=0, max_value=10_000_000)
+    lines_cleared = serializers.IntegerField(min_value=0, max_value=10_000)
+    level = serializers.IntegerField(min_value=1, max_value=1_000)
+
     class Meta:
         model = Score
         fields = ['id', 'game_id', 'player_name', 'score', 'lines_cleared', 'level', 'created_at']

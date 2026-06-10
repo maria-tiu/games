@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -21,9 +22,34 @@ from .serializers import (
 )
 
 
+# ---------------------------------------------------------------------------
+# Scoped throttle classes for sensitive endpoints (rates defined in settings)
+# ---------------------------------------------------------------------------
+
+class LoginRateThrottle(AnonRateThrottle):
+    """Limits brute-force login attempts from unauthenticated clients."""
+    scope = 'login'
+
+
+class RegisterRateThrottle(AnonRateThrottle):
+    """Limits mass account-creation from unauthenticated clients."""
+    scope = 'register'
+
+
+class PasswordResetRateThrottle(AnonRateThrottle):
+    """Limits password-reset requests to prevent email flooding."""
+    scope = 'password_reset'
+
+
+class ScoresRateThrottle(AnonRateThrottle):
+    """Limits unauthenticated score submissions."""
+    scope = 'scores'
+
+
 class ScoreListCreateView(generics.ListCreateAPIView):
     serializer_class = ScoreSerializer
     permission_classes = [AllowAny]
+    throttle_classes = [ScoresRateThrottle, UserRateThrottle]
 
     def get_queryset(self):
         game_id = self.request.query_params.get('game_id')
@@ -39,6 +65,7 @@ class ScoreListCreateView(generics.ListCreateAPIView):
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [RegisterRateThrottle]
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -51,17 +78,18 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [LoginRateThrottle]
 
     def post(self, request):
         username = request.data.get('username', '').strip()
         password = request.data.get('password', '')
-        if not User.objects.filter(username=username).exists():
-            return Response({'detail': 'Username not found.'}, status=status.HTTP_401_UNAUTHORIZED)
         user = authenticate(username=username, password=password)
         if user:
             token, _ = Token.objects.get_or_create(user=user)
             return Response({'token': token.key, 'username': user.username})
-        return Response({'detail': 'Incorrect password.'}, status=status.HTTP_401_UNAUTHORIZED)
+        # Use a generic message to avoid disclosing whether the username exists
+        # (prevents username enumeration - OWASP API2:2023).
+        return Response({'detail': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(APIView):
@@ -74,6 +102,7 @@ class LogoutView(APIView):
 
 class PasswordResetRequestView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [PasswordResetRateThrottle]
 
     def post(self, request):
         serializer = PasswordResetSerializer(data=request.data)

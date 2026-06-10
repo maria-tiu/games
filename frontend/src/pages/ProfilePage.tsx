@@ -190,6 +190,7 @@ export default function ProfilePage() {
                   value={newUsername}
                   onChange={(e) => setNewUsername(e.target.value)}
                   autoFocus
+                  maxLength={150}
                 />
                 <button
                   className="btn-profile btn-save"
@@ -233,6 +234,7 @@ export default function ProfilePage() {
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   autoFocus
+                  maxLength={254}
                 />
                 <button
                   className="btn-profile btn-save"

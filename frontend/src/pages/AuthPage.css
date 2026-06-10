@@ -269,3 +269,30 @@
   line-height: 1.5;
   margin-top: -4px;
 }
+
+/* A07 – Password strength indicator */
+.auth-password-strength {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.auth-password-strength--weak {
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.12);
+}
+
+.auth-password-strength--fair {
+  color: #ffaa00;
+  background: rgba(255, 170, 0, 0.12);
+}
+
+.auth-password-strength--strong {
+  color: #00cc66;
+  background: rgba(0, 204, 102, 0.12);
+}

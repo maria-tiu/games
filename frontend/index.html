@@ -4,6 +4,30 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      A02 – Security Misconfiguration: Content Security Policy
+      Restricts where scripts, styles, and connections can originate from.
+      'unsafe-inline' in style-src is required for React's inline style props.
+      ws://localhost:* and ws://127.0.0.1:* support Vite HMR in development.
+      For production deployments, set a stricter CSP via HTTP response headers
+      from your web server (nginx / CDN) and remove the localhost/ws entries.
+    -->
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self';
+               style-src 'self' 'unsafe-inline';
+               img-src 'self' data:;
+               connect-src 'self'
+                           http://localhost:8000
+                           http://127.0.0.1:8000
+                           ws://localhost:*
+                           ws://127.0.0.1:*;
+               font-src 'self';
+               object-src 'none';
+               base-uri 'self';
+               form-action 'self'" />
+    <!-- A02 – Security Misconfiguration: Referrer-Policy -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <title>Games</title>
   </head>
   <body>

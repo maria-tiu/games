@@ -114,6 +114,15 @@ cd backend
 python manage.py test
 ```
 
+Backend test report and coverage:
+
+```bash
+cd backend
+coverage run --source='tetris' manage.py test
+coverage report -m
+coverage xml -o coverage.xml
+```
+
 ### Frontend (if test runner is configured)
 
 ```bash
